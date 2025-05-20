@@ -1,0 +1,33 @@
+/* 背景と全体フォント */
+body {
+  background-color: #f8f9fa;          /* 薄いグレー */
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+/* 中央寄せ用のカード */
+.card-center {
+  max-width: 480px;   /* 幅を制限 */
+  margin: 0 auto;     /* 左右中央 */
+}
+
+/* 見出し下の余白 */
+h2 {
+  margin-bottom: 1rem;
+}
+
+/* ヘッダー配色 */
+.bg-header-custom {
+  background-color: #FF8B20;  /* 例：紫色 */
+  color: white;
+}
+
+/* base.css */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: bold;
+}

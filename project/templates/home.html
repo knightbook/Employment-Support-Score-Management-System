@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}ホーム | 就労支援A型{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+
+  <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+    <a href="{{ url_for('score_input') }}" class="btn btn-light d-flex flex-column align-items-center p-3 shadow-sm" style="width: 150px;">
+      <img src="{{ url_for('static', filename='images/score_input_icon.png') }}" alt="スコア入力" style="width: 50px; height: 50px;">
+      <span>スコア入力</span>
+    </a>
+
+    <a href="{{ url_for('score_list') }}" class="btn btn-light d-flex flex-column align-items-center p-3 shadow-sm" style="width: 150px;">
+      <img src="{{ url_for('static', filename='images/score_list_icon.png') }}" alt="スコア一覧" style="width: 50px; height: 50px;">
+      <span>スコア一覧</span>
+    </a>
+
+    <a href="{{ url_for('aggregate') }}" class="btn btn-light d-flex flex-column align-items-center p-3 shadow-sm" style="width: 150px;">
+      <img src="{{ url_for('static', filename='images/aggregate_icon.png') }}" alt="集計/グラフ表示" style="width: 50px; height: 50px;">
+      <span>集計/グラフ表示</span>
+    </a>
+
+    <a href="{{ url_for('data_management') }}" class="btn btn-light d-flex flex-column align-items-center p-3 shadow-sm" style="width: 150px;">
+      <img src="{{ url_for('static', filename='images/data_management_icon.png') }}" alt="データ管理" style="width: 50px; height: 50px;">
+      <span>データ管理</span>
+    </a>
+  </div>
+
+  <div class="mb-4">
+    <a href="{{ url_for('help') }}" class="btn btn-info">ヘルプ</a>
+  </div>
+
+  <div class="alert alert-secondary text-start">
+    <h5>お知らせ</h5>
+    <ul>
+      <li>新機能を追加しました。</li>
+      <li>システムメンテナンスのお知らせ：5月30日 10:00〜12:00</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

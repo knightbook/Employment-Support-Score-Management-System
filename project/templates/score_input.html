@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% block title %}スコア入力 | 就労支援A型{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-5">就労支援A型 スコア評価入力</h1>
+
+<div class="container">
+  
+
+  <form method="POST" action="{{ url_for('score_input') }}">
+    <!-- ======== 様式 2‑1 追加分 ====================================== -->
+ <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-1 就労継続支援Ａ型事業所におけるスコア表（全体）</h2>
+    <!-- 労働時間 -->
+    <fieldset class="mb-4">
+      <legend>Ⅰ. 労働時間</legend>
+      <div class="mb-3">
+        <label for="working_hours" class="form-label">1日の平均労働時間</label>
+        <select name="working_hours" id="working_hours" class="form-select" required>
+          <option value="">選択してください</option>
+          <option value="90">① 7時間以上</option>
+          <option value="80">② 6～7時間未満</option>
+          <option value="65">③ 5～6時間未満</option>
+          <option value="55">④ 4.5～5時間未満</option>
+          <option value="40">⑤ 4～4.5時間未満</option>
+          <option value="30">⑥ 3～4時間未満</option>
+          <option value="20">⑦ 2～3時間未満</option>
+          <option value="5">⑧ 2時間未満</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <!-- 生産活動 -->
+    <fieldset class="mb-4">
+      <legend>Ⅱ. 生産活動</legend>
+      <div class="mb-3">
+        <label for="production_result" class="form-label">生産活動収支状況（過去3年）</label>
+        <select name="production_result" id="production_result" class="form-select" required>
+          <option value="">選択してください</option>
+          <option value="60">① 3年すべて黒字</option>
+          <option value="50">② 2年黒字</option>
+          <option value="40">③ 1年黒字（前年度）</option>
+          <option value="20">④ 1年黒字（前々年度）</option>
+          <option value="-10">⑤ 2年赤字</option>
+          <option value="-20">⑥ 3年赤字</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <!-- 多様な働き方 -->
+    <fieldset class="mb-4">
+      <legend>Ⅲ. 多様な働き方（該当するものすべてにチェック）</legend>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="license" id="license">
+        <label class="form-check-label" for="license">免許・資格取得支援制度</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="promotion" id="promotion">
+        <label class="form-check-label" for="promotion">職員への登用制度</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="sidejob" id="sidejob">
+        <label class="form-check-label" for="sidejob">副業・兼業の容認</label>
+      </div>
+    </fieldset>
+
+    <!-- 支援力向上 -->
+    <fieldset class="mb-4">
+      <legend>Ⅳ. 支援力向上</legend>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="training" id="training">
+        <label class="form-check-label" for="training">外部研修の受講</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="seminar" id="seminar">
+        <label class="form-check-label" for="seminar">学会・勉強会参加</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="eval_system" id="eval_system">
+        <label class="form-check-label" for="eval_system">評価制度の導入</label>
+      </div>
+    </fieldset>
+
+    <!-- Ⅴ. 地域連携活動 ------------------------------------------------>
+<fieldset class="mb-4">
+  <legend>Ⅴ. 地域連携活動</legend>
+  <p class="small text-muted mb-2">活動があればチェック（1項目10点）</p>
+
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox"
+           name="regional_activity[]" value="10" id="ra_dev">
+    <label class="form-check-label" for="ra_dev">
+      地域と連携した新商品開発や生産活動（結果を公表）
+    </label>
+  </div>
+</fieldset>
+
+<!-- Ⅵ. 経営改善計画 --------------------------------------------->
+<fieldset class="mb-4">
+  <legend>Ⅵ. 経営改善計画</legend>
+  <div class="mb-3">
+    <label class="form-label d-block mb-1">経営改善計画の提出状況</label>
+
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="improve_plan"
+             value="0" id="plan_not_required" required>
+      <label class="form-check-label" for="plan_not_required">
+        提出を求められていない／期限内に提出済み（0点）
+      </label>
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="improve_plan"
+             value="-50" id="plan_late">
+      <label class="form-check-label" for="plan_late">
+        期限内に提出していない（‑50点）
+      </label>
+    </div>
+  </div>
+</fieldset>
+
+<!-- Ⅶ. 利用者の知識・能力向上 ------------------------------------->
+<fieldset class="mb-4">
+  <legend>Ⅶ. 利用者の知識・能力向上</legend>
+  <p class="small text-muted mb-2">
+    具体的支援を行い報告書を公表している場合は 10 点
+  </p>
+
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="user_skill_up"
+           value="10" id="skillup_yes" required>
+    <label class="form-check-label" for="skillup_yes">
+      支援を実施し報告書を公表している（10点）
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="user_skill_up"
+           value="0" id="skillup_no">
+    <label class="form-check-label" for="skillup_no">
+      実施・公表していない（0点）
+    </label>
+  </div>
+</fieldset>
+<!-- ======== 様式 2‑2 追加分 ====================================== -->
+ <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-2 就労継続支援Ａ型事業所におけるスコア表（実績Ⅰ～Ⅳ、Ⅵ）</h2>
+<!-- （Ⅰ） 利用者・平均工賃などの基本実績情報 ---------------------->
+<fieldset class="mb-4">
+  <legend>Ⅰ. 利用者・工賃等 実績</legend>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label for="num_users" class="form-label">利用者数（人）</label>
+      <input type="number" class="form-control" id="num_users" name="num_users" required>
+    </div>
+    <div class="col-md-4">
+      <label for="average_wage" class="form-label">平均工賃（月額・円）</label>
+      <input type="number" class="form-control" id="average_wage" name="average_wage" required>
+    </div>
+    <div class="col-md-4">
+      <label for="employment_rate" class="form-label">一般就労への移行者数（人）</label>
+      <input type="number" class="form-control" id="employment_rate" name="employment_rate">
+    </div>
+  </div>
+</fieldset>
+
+<!-- 生産活動（年度収支） ---------------------------------------->
+<fieldset class="mb-4">
+  <legend>Ⅱ. 生産活動 ‑ 年度別収支</legend>
+  <p class="small text-muted">直近3年度分を入力</p>
+
+  <table class="table table-sm align-middle">
+    <thead class="table-light">
+      <tr>
+        <th style="width:18%">年度</th>
+        <th style="width:28%">生産活動収支額 <br><span class="small">(収入‑経費)</span></th>
+        <th style="width:28%">利用者へ支払った賃金総額</th>
+        <th style="width:26%">備考</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for y in [1,2,3] %}
+      <tr>
+        <td>
+          <input type="text" class="form-control" name="year_{{ y }}" placeholder="例：2024">
+        </td>
+        <td>
+          <input type="number" class="form-control" name="income_{{ y }}" step="1">
+        </td>
+        <td>
+          <input type="number" class="form-control" name="wage_{{ y }}" step="1">
+        </td>
+        <td>
+          <input type="text" class="form-control" name="note_income_{{ y }}">
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</fieldset>
+
+<!-- Ⅲ. 多様な働き方（詳細欄） ----------------------------------->
+<fieldset class="mb-4">
+  <legend>Ⅲ. 多様な働き方 具体的取組</legend>
+  <p class="small text-muted">
+    例：免許・資格取得支援、職員登用制度、在宅勤務規程など
+  </p>
+  <textarea name="diversity_desc" class="form-control" rows="3"></textarea>
+</fieldset>
+
+<!-- Ⅳ. 支援力向上（詳細欄） ------------------------------------->
+<fieldset class="mb-4">
+  <legend>Ⅳ. 支援力向上 具体的取組</legend>
+  <p class="small text-muted">
+    例：研修計画、学会発表、視察受入、人事評価制度、ピアサポーター配置等
+  </p>
+  <textarea name="support_desc" class="form-control" rows="3"></textarea>
+</fieldset>
+
+<!-- Ⅴ. 地域連携活動（チェック＆詳細） --------------------------->
+<fieldset class="mb-4">
+  <legend>Ⅴ. 地域連携活動</legend>
+  <div class="form-check mb-2">
+    <input class="form-check-input" type="checkbox" id="ra_checked"
+           name="regional_activity_checked" value="10">
+    <label class="form-check-label" for="ra_checked">
+      地域連携の生産活動や商品開発を行い結果を公表した（10点）
+    </label>
+  </div>
+  <textarea name="regional_activity_desc" class="form-control" rows="2"
+            placeholder="活動内容・公表URL等"></textarea>
+</fieldset>
+
+<!-- Ⅵ. 経営改善計画（既存ラジオに詳細欄追加） ------------------->
+<fieldset class="mb-4">
+  <legend>Ⅵ. 経営改善計画 詳細</legend>
+  <p class="small text-muted">必要に応じて提出状況や備考を入力</p>
+  <textarea name="plan_desc" class="form-control" rows="2"></textarea>
+</fieldset>
+
+<!-- Ⅶ. 利用者の知識・能力向上（詳細欄） ------------------------>
+<fieldset class="mb-4">
+  <legend>Ⅶ. 利用者の知識・能力向上 具体的支援</legend>
+  <textarea name="skillup_desc" class="form-control" rows="3"></textarea>
+</fieldset>
+
+    <!-- 備考 -->
+    <div class="mb-4">
+      <label for="memo" class="form-label">備考</label>
+      <textarea name="memo" id="memo" class="form-control" rows="3"></textarea>
+    </div>
+
+    <!-- 登録ボタン -->
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary px-5">登録する</button>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

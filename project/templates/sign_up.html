@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}新規作成 | 就労支援A型{% endblock %}
+
+{% block content %}
+<div class="card card-center p-4 shadow-sm">
+    <h2 class="mb-3">新規ユーザー作成</h2>
+
+    <div class="row justify-content-center">
+      <form method="post" action="{{ url_for('sign_up') }}" class="col-md-5">
+          <div class="mb-3">
+              <label for="userId" class="form-label">ユーザーID</label>
+              <input type="text" class="form-control" id="userId" name="userId" required>
+          </div>
+
+          <div class="mb-3">
+              <label for="password" class="form-label">パスワード</label>
+              <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+
+          <div class="mb-3">
+              <label for="passwordConfirm" class="form-label">パスワード（確認）</label>
+              <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" required>
+          </div>
+
+          <div class="mb-3">
+              <label for="email" class="form-label">メールアドレス</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+          </div>
+
+          <button type="submit" class="btn btn-success">新規作成</button>
+          <a href="{{ url_for('login') }}" class="btn btn-secondary ms-2">キャンセル</a>
+      </form>
+    </div>
+</div>
+{% endblock %}
