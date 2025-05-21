@@ -6,6 +6,8 @@
 ---
 
 ## 📂 プロジェクト構成
+
+```text
 Employment-Support-Score-Management-System/
 ├── project/ # Flaskアプリ本体
 │ ├── app.py # メインアプリ
@@ -16,7 +18,7 @@ Employment-Support-Score-Management-System/
 │ ├── diagrams/ # クラス図・画面遷移図など
 │ └── gantt_schedule.xlsx # ガントチャート
 └── README.md # このファイル
-
+```
 ---
 
 ## 🛠 使用技術
@@ -36,25 +38,39 @@ git clone https://github.com/knightbook/Employment-Support-Score-Management-Syst
 cd project
 pip install -r requirements.txt  # ← 未作成の場合は flask だけでOK
 python app.py
-
+```
 初期状態でアクセス：
 http://127.0.0.1:5000/
 
-📊 ドキュメント
-[画面遷移図を見る](docs/spec/screen_transition.png)
+---
 
-[クラス図を見る](docs/spec/class_diagram.md)
+## 📊 ドキュメント
 
-[ER図を見る](docs/spec/er_diagram.md)
+- [画面遷移図を見る](docs/spec/screen_transition.png)
 
-[ガントチャートを見るExcel](docs/gantt_schedule.xlsx)
-[ガントチャートを見るスプレッドシート](https://docs.google.com/spreadsheets/d/1azG9TA4BbKPsPT6v6eGvHxt8wK9uoPRG2MnWV8D-lPI/edit?usp=sharing)
+- [クラス図を見る](docs/spec/class_diagram.md)
 
-📌 ライセンス / 著作権
+- [ER図を見る](docs/spec/er_diagram.md)
+
+- [ガントチャートを見るExcel](docs/gantt_schedule.xlsx)
+- [ガントチャートを見るスプレッドシート](https://docs.google.com/spreadsheets/d/1azG9TA4BbKPsPT6v6eGvHxt8wK9uoPRG2MnWV8D-lPI/edit?usp=sharing)
+| 種別                       | ファイル                                                                                                           |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| 画面遷移図                    | [docs/diagrams/screen\_transition.drawio](docs/diagrams/screen_transition.drawio)                              |
+| クラス図                     | [docs/diagrams/class\_diagram.md](docs/diagrams/class_diagram.md)                                              |
+| ER 図                     | [docs/diagrams/er\_diagram.md](docs/diagrams/er_diagram.md)                                                    |
+| ガントチャート（Excel）           | [docs/gantt\_schedule.xlsx](docs/gantt_schedule.xlsx)                                                          |
+| ガントチャート（Google スプレッドシート） | [🔗 こちら](https://docs.google.com/spreadsheets/d/1azG9TA4BbKPsPT6v6eGvHxt8wK9uoPRG2MnWV8D-lPI/edit?usp=sharing) |
+
+---
+
+## 📌 ライセンス / 著作権
 このリポジトリは開発学習目的で使用されています。
 商用利用または業務導入の際は別途ライセンスに従ってください。
 
-👤 開発者
+---
+
+## 👤 開発者
 GitHub: @knightbook
 
 開発補助: ChatGPT（OpenAI）
