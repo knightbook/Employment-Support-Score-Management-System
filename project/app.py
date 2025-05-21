@@ -1,53 +1,113 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+"""
+就労支援A型スコア管理システム  Flask アプリ
+---------------------------------------------
+- ログイン / 新規登録
+- スコア入力・保存（様式 2-1, 2-2 対応）
+- スコア一覧表示
+SQLite + SQLAlchemy で永続化
+"""
 
+from datetime import datetime
+from flask import (
+    Flask, render_template, request,
+    redirect, url_for, flash, session
+)
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# ============================================================
+# アプリ基本設定
+# ============================================================
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'   # FIXME: 本番環境では環境変数などで設定
+app.secret_key = 'your_secret_key'          # TODO: 本番は環境変数に
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///essms.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-# ===== 仮ユーザー辞書（本来はDB） =====
-users = {"testuser": "1234"}
+# ============================================================
+# DB モデル定義
+# ============================================================
+class User(db.Model):
+    id       = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    email    = db.Column(db.String(120))
 
-# ✨ 仮スコア保存（後でDBに置き換え） --------------------------
-scores = []        # 1件 = dict で保存する簡易リスト
+class Score(db.Model):
+    id              = db.Column(db.Integer, primary_key=True)
+    user_id         = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
 
-# ---------- ログイン ----------
+    # --- 様式 2-1 ------------------------------------------------
+    working_hours   = db.Column(db.Integer, default=0)
+    production_res  = db.Column(db.Integer, default=0)
+    diversity       = db.Column(db.Text)           # CSV 文字列
+    support_skill   = db.Column(db.Text)           # CSV 文字列
+    regional_score  = db.Column(db.Integer, default=0)
+    improve_plan    = db.Column(db.Integer, default=0)
+    skill_up        = db.Column(db.Integer, default=0)
+
+    # --- 様式 2-2 ------------------------------------------------
+    num_users       = db.Column(db.Integer)
+    average_wage    = db.Column(db.Integer)
+    employment_rate = db.Column(db.Integer)
+    production_json = db.Column(db.Text)           # 年度別収支を JSON で保存
+
+    memo            = db.Column(db.Text)
+    total           = db.Column(db.Integer, default=0)
+
+# 初回のみ下記 2 行を Python シェル等で実行
+# >>> from app import db
+# >>> db.create_all()
+
+# ============================================================
+# 認証系ルート
+# ============================================================
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    """ログイン画面 & 認証処理"""
     if request.method == 'POST':
-        user_id = request.form.get('userId')
-        password = request.form.get('password')
-
-        if user_id in users and users[user_id] == password:
-            session['user_id'] = user_id
+        user = User.query.filter_by(username=request.form['userId']).first()
+        if user and check_password_hash(user.password, request.form['password']):
+            session['user_id'] = user.id
             return redirect(url_for('home'))
-        else:
-            flash('ユーザーIDまたはパスワードが違います。')
-            return redirect(url_for('login'))
-
+        flash('ユーザーIDまたはパスワードが違います。')
     return render_template('login.html')
 
-# ---------- 新規ユーザー登録 ----------
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
+    """新規ユーザー登録"""
     if request.method == 'POST':
-        user_id = request.form.get('userId')
-        password = request.form.get('password')
-        password_confirm = request.form.get('passwordConfirm')
-        email = request.form.get('email')
+        uid      = request.form['userId']
+        pwd      = request.form['password']
+        pwd2     = request.form['passwordConfirm']
+        email    = request.form['email']
 
-        if not user_id or not password or not email:
+        if not uid or not pwd or not email:
             flash('必須項目を入力してください。')
-        elif password != password_confirm:
+        elif pwd != pwd2:
             flash('パスワードが一致しません。')
-        elif user_id in users:
-            flash('このユーザーIDはすでに使われています。')
+        elif User.query.filter_by(username=uid).first():
+            flash('このユーザーIDは既に存在します。')
         else:
-            users[user_id] = password
+            user = User(username=uid,
+                        password=generate_password_hash(pwd),
+                        email=email)
+            db.session.add(user); db.session.commit()
             flash('登録が完了しました。ログインしてください。')
             return redirect(url_for('login'))
-
     return render_template('sign_up.html')
 
-# ---------- ホーム ----------
+@app.route('/logout')
+def logout():
+    """ログアウト"""
+    session.clear()
+    flash('ログアウトしました。')
+    return redirect(url_for('login'))
+
+# ============================================================
+# メインメニュー
+# ============================================================
 @app.route('/home')
 def home():
     if 'user_id' not in session:
@@ -55,89 +115,77 @@ def home():
         return redirect(url_for('login'))
     return render_template('home.html')
 
-# ---------- スコア入力 ✨ ----------
+# ============================================================
+# スコア入力
+# ============================================================
 @app.route('/score_input', methods=['GET', 'POST'])
 def score_input():
     if 'user_id' not in session:
-        flash('ログインしてください。')
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        # フォーム値を取得
-        score_data = {
-            'user_id': session['user_id'],
-            'working_hours': int(request.form.get('working_hours', 0)),
-            'production_result': int(request.form.get('production_result', 0)),
-            'diversity': request.form.getlist('diversity[]'),
-            'support_skill': request.form.getlist('support_skill[]'),
-            'memo': request.form.get('memo', '')
-        }
+        # ---- フォーム値取得 ------------------------------------
+        sc = Score(
+            user_id         = session['user_id'],
+            working_hours   = int(request.form.get('working_hours', 0)),
+            production_res  = int(request.form.get('production_result', 0)),
+            diversity       = ','.join(request.form.getlist('diversity[]')),
+            support_skill   = ','.join(request.form.getlist('support_skill[]')),
+            regional_score  = int(request.form.get('regional_activity_checked') or 0),
+            improve_plan    = int(request.form.get('improve_plan', 0)),
+            skill_up        = int(request.form.get('user_skill_up', 0)),
+            num_users       = int(request.form.get('num_users', 0)),
+            average_wage    = int(request.form.get('average_wage', 0)),
+            employment_rate = int(request.form.get('employment_rate', 0)),
+            memo            = request.form.get('memo', '')
+        )
+        # TODO: 年度別収支テーブル→JSON 保存
+        # --------------------------------------------------------
 
-        # 合計点（多様な働き方や支援力向上は項目ごとに 5 点を仮で加算）
-        total = score_data['working_hours'] + score_data['production_result']
-        total += len(score_data['diversity']) * 5
-        total += len(score_data['support_skill']) * 5
-        score_data['total'] = total
-
-        # 保存（後でDBへ変更予定）
-        scores.append(score_data)
-
-        flash(f"スコアを登録しました。（合計 {total} 点）")
+        # ---- 合計点計算（簡易） ---------------------------------
+        sc.total = (
+            sc.working_hours + sc.production_res +
+            len(sc.diversity.split(','))*5 +
+            len(sc.support_skill.split(','))*5 +
+            sc.regional_score + sc.improve_plan + sc.skill_up
+        )
+        # ---------------------------------------------------------
+        db.session.add(sc); db.session.commit()
+        flash(f"スコアを登録しました。（合計 {sc.total} 点）")
         return redirect(url_for('score_list'))
 
-    # GET → フォーム表示
     return render_template('score_input.html')
 
-# ---------- スコア一覧 ✨ ----------
+# ============================================================
+# スコア一覧
+# ============================================================
 @app.route('/score_list')
 def score_list():
-    if 'user_id' not in session:
-        flash('ログインしてください。')
-        return redirect(url_for('login'))
-
-    # 自分のスコアのみ表示
-    user_scores = [s for s in scores if s['user_id'] == session['user_id']]
+    if 'user_id' not in session: return redirect(url_for('login'))
+    user_scores = Score.query.filter_by(user_id=session['user_id']).order_by(Score.created_at.desc()).all()
     return render_template('score_list.html', scores=user_scores)
 
-# ---------- ユーザー一覧 ----------
+# ============================================================
+# プレースホルダ ルート（今後実装）
+# ============================================================
 @app.route('/user_list')
 def user_list():
-    if 'user_id' not in session:
-        flash('ログインしてください。')
-        return redirect(url_for('login'))
-    return "<h3>ユーザー一覧画面（開発中）</h3>"
+    return "<h3>ユーザー一覧（開発中）</h3>"
 
-# ---------- 集計 / グラフ表示（プレースホルダ） ----------
 @app.route('/aggregate')
 def aggregate():
-    if 'user_id' not in session:
-        flash('ログインしてください。')
-        return redirect(url_for('login'))
-    return "<h3>集計・グラフ表示画面（開発中）</h3>"
+    return "<h3>集計・グラフ表示（開発中）</h3>"
 
-# ---------- データ管理（プレースホルダ） ----------
 @app.route('/data_management')
 def data_management():
-    if 'user_id' not in session:
-        flash('ログインしてください。')
-        return redirect(url_for('login'))
-    return "<h3>データ管理画面（開発中）</h3>"
+    return "<h3>データ管理（開発中）</h3>"
 
-# ---------- ヘルプ ----------
 @app.route('/help')
 def help():
-    if 'user_id' not in session:
-        flash('ログインしてください。')
-        return redirect(url_for('login'))
     return "<h3>ヘルプページ（開発中）</h3>"
 
-# ---------- ログアウト ----------
-@app.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    flash('ログアウトしました。')
-    return redirect(url_for('login'))
-
-# ---------- エントリーポイント ----------
+# ============================================================
+# アプリ起動
+# ============================================================
 if __name__ == '__main__':
     app.run(debug=True)
