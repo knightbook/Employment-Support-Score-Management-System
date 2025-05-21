@@ -9,14 +9,17 @@
 
 ```text
 Employment-Support-Score-Management-System/
+|
 ├── project/ # Flaskアプリ本体
 │ ├── app.py # メインアプリ
 │ ├── templates/ # HTMLテンプレート（Jinja2）
 │ └── static/ # CSS・画像など
+|
 ├── docs/ # 設計・資料
 │ ├── wireframes/ # ワイヤーフレーム（drawio, png）
 │ ├── diagrams/ # クラス図・画面遷移図など
 │ └── gantt_schedule.xlsx # ガントチャート
+|
 └── README.md # このファイル
 ```
 ---
