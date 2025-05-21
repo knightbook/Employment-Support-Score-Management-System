@@ -40,14 +40,47 @@ classDiagram
         +String passwordHash
         +authenticate()
     }
+
     class ScoreRecord {
         +int id
-        +Date recordDate
-        +int workScore
-        +int communicationScore
-        +int hygieneScore
-        +String memo
-        +average()
+        +Date period_start
+        +Date period_end
+        +String staff_name
+        +int? client_id
+        +String? new_client_name
+        +int working_hours
+        +int production_result
+        +bool diversity_license
+        +bool diversity_promotion
+        +bool diversity_sidejob
+        +bool support_training
+        +bool support_seminar
+        +bool support_eval_system
+        +bool regional_activity_checked
+        +int improve_plan
+        +int user_skill_up
+        +int num_users
+        +int average_wage
+        +int? employment_rate
+        +String? year_1
+        +int? income_1
+        +int? wage_1
+        +String? note_income_1
+        +String? year_2
+        +int? income_2
+        +int? wage_2
+        +String? note_income_2
+        +String? year_3
+        +int? income_3
+        +int? wage_3
+        +String? note_income_3
+        +String? diversity_desc
+        +String? support_desc
+        +String? regional_activity_desc
+        +String? plan_desc
+        +String? skillup_desc
+        +String? memo
+        +float average()
     }
 
     class DatabaseService {
