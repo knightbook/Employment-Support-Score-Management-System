@@ -54,13 +54,6 @@ http://127.0.0.1:5000/
 
 - [ガントチャートを見るExcel](docs/gantt_schedule.xlsx)
 - [ガントチャートを見るスプレッドシート](https://docs.google.com/spreadsheets/d/1azG9TA4BbKPsPT6v6eGvHxt8wK9uoPRG2MnWV8D-lPI/edit?usp=sharing)
-| 種別                       | ファイル                                                                                                           |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| 画面遷移図                    | [docs/diagrams/screen\_transition.drawio](docs/diagrams/screen_transition.drawio)                              |
-| クラス図                     | [docs/diagrams/class\_diagram.md](docs/diagrams/class_diagram.md)                                              |
-| ER 図                     | [docs/diagrams/er\_diagram.md](docs/diagrams/er_diagram.md)                                                    |
-| ガントチャート（Excel）           | [docs/gantt\_schedule.xlsx](docs/gantt_schedule.xlsx)                                                          |
-| ガントチャート（Google スプレッドシート） | [🔗 こちら](https://docs.google.com/spreadsheets/d/1azG9TA4BbKPsPT6v6eGvHxt8wK9uoPRG2MnWV8D-lPI/edit?usp=sharing) |
 
 ---
 
