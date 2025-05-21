@@ -5,9 +5,66 @@
 <h1 class="text-center mb-5">就労支援A型 スコア評価入力</h1>
 
 <div class="container">
-  
 
   <form method="POST" action="{{ url_for('score_input') }}">
+
+    <!-- スタッフ（ログインユーザー） -->
+    <fieldset class="mb-4">
+      <legend>入力者（スタッフ）: {{ current_user.username }}</legend>
+      
+      <!-- 送信用にhiddenも残す -->
+      <input type="hidden" name="inputter_name" value="{{ current_user.username }}">
+    </fieldset>
+
+
+    <!-- 期間 -->
+    <fieldset class="mb-4">
+      <legend>入力期間</legend>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="period_start" class="form-label">開始日</label>
+          <input type="date" id="period_start" name="period_start" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label for="period_end" class="form-label">終了日</label>
+          <input type="date" id="period_end" name="period_end" class="form-control" required>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- 利用者選択・新規利用者入力 -->
+    <fieldset class="mb-4">
+      <legend>利用者選択または新規入力</legend>
+      <div class="mb-3">
+        <label for="client_select" class="form-label">利用者を選択してください</label>
+        <select id="client_select" name="client_select" class="form-select" onchange="toggleClientInput()" required>
+          <option value="">選択してください</option>
+          <option value="new">新規利用者を入力</option>
+          {% for client in clients %}
+          <option value="{{ client.id }}">{{ client.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3" id="new_client_div" style="display:none;">
+        <label for="new_client_name" class="form-label">新規利用者名を入力してください</label>
+        <input type="text" id="new_client_name" name="new_client_name" class="form-control">
+      </div>
+    </fieldset>
+
+    <script>
+    function toggleClientInput() {
+      const select = document.getElementById('client_select');
+      const newClientDiv = document.getElementById('new_client_div');
+      if (select.value === 'new') {
+        newClientDiv.style.display = 'block';
+        document.getElementById('new_client_name').setAttribute('required', 'required');
+      } else {
+        newClientDiv.style.display = 'none';
+        document.getElementById('new_client_name').removeAttribute('required');
+      }
+    }
+    </script>
     <!-- ======== 様式 2‑1 追加分 ====================================== -->
  <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-1 就労継続支援Ａ型事業所におけるスコア表（全体）</h2>
     <!-- 労働時間 -->

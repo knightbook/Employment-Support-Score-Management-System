@@ -7,26 +7,23 @@
 SQLite + SQLAlchemy で永続化
 """
 
-from datetime import datetime
-from flask import (
-    Flask, render_template, request,
-    redirect, url_for, flash, session
-)
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, Client, ScoreRecord  # もしmodels.py使うなら。使わないなら削除
+from datetime import datetime
+import json
 
-# ============================================================
-# アプリ基本設定
-# ============================================================
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'          # TODO: 本番は環境変数に
+app.secret_key = 'your_secret_key'  # TODO: 本番は環境変数に
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///essms.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+
+db.init_app(app)
 
 # ============================================================
-# DB モデル定義
+# DBモデル（このファイルで定義する場合はこっちを使う）
 # ============================================================
+# もし models.py にまとめてるならここは削除してください。
 class User(db.Model):
     id       = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
@@ -56,10 +53,6 @@ class Score(db.Model):
     memo            = db.Column(db.Text)
     total           = db.Column(db.Integer, default=0)
 
-# 初回のみ下記 2 行を Python シェル等で実行
-# >>> from app import db
-# >>> db.create_all()
-
 # ============================================================
 # 認証系ルート
 # ============================================================
@@ -76,27 +69,30 @@ def login():
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
-    """新規ユーザー登録"""
     if request.method == 'POST':
-        uid      = request.form['userId']
-        pwd      = request.form['password']
-        pwd2     = request.form['passwordConfirm']
-        email    = request.form['email']
+        user_name = request.form.get('userName', '').strip()
+        password = request.form.get('password', '').strip()
+        if not user_name or not password:
+            flash("氏名とパスワードを入力してください。")
+            return redirect(url_for('sign_up'))
 
-        if not uid or not pwd or not email:
-            flash('必須項目を入力してください。')
-        elif pwd != pwd2:
-            flash('パスワードが一致しません。')
-        elif User.query.filter_by(username=uid).first():
-            flash('このユーザーIDは既に存在します。')
-        else:
-            user = User(username=uid,
-                        password=generate_password_hash(pwd),
-                        email=email)
-            db.session.add(user); db.session.commit()
-            flash('登録が完了しました。ログインしてください。')
-            return redirect(url_for('login'))
+        # すでに同じユーザー名が登録されていないか確認
+        existing_user = User.query.filter_by(username=user_name).first()
+        if existing_user:
+            flash("その氏名はすでに登録されています。")
+            return redirect(url_for('sign_up'))
+
+        # 新規ユーザー作成（パスワードはハッシュ化すること！）
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=user_name, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash("登録完了しました。ログインしてください。")
+        return redirect(url_for('login'))
+
     return render_template('sign_up.html')
+
 
 @app.route('/logout')
 def logout():
@@ -123,8 +119,25 @@ def score_input():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    # ログイン中ユーザーをDBから取得
+    user = User.query.get(session['user_id'])
+
     if request.method == 'POST':
-        # ---- フォーム値取得 ------------------------------------
+        production_json = {
+            "year_1": request.form.get('year_1', ''),
+            "income_1": int(request.form.get('income_1', 0)),
+            "wage_1": int(request.form.get('wage_1', 0)),
+            "note_income_1": request.form.get('note_income_1', ''),
+            "year_2": request.form.get('year_2', ''),
+            "income_2": int(request.form.get('income_2', 0)),
+            "wage_2": int(request.form.get('wage_2', 0)),
+            "note_income_2": request.form.get('note_income_2', ''),
+            "year_3": request.form.get('year_3', ''),
+            "income_3": int(request.form.get('income_3', 0)),
+            "wage_3": int(request.form.get('wage_3', 0)),
+            "note_income_3": request.form.get('note_income_3', ''),
+        }
+
         sc = Score(
             user_id         = session['user_id'],
             working_hours   = int(request.form.get('working_hours', 0)),
@@ -137,31 +150,33 @@ def score_input():
             num_users       = int(request.form.get('num_users', 0)),
             average_wage    = int(request.form.get('average_wage', 0)),
             employment_rate = int(request.form.get('employment_rate', 0)),
-            memo            = request.form.get('memo', '')
-        )
-        # TODO: 年度別収支テーブル→JSON 保存
-        # --------------------------------------------------------
+            production_json = json.dumps(production_json, ensure_ascii=False),
+            memo            = request.form.get('memo', ''),
+            inputter_name   = request.form.get('inputter_name', '')
+)
 
-        # ---- 合計点計算（簡易） ---------------------------------
+
         sc.total = (
             sc.working_hours + sc.production_res +
             len(sc.diversity.split(','))*5 +
             len(sc.support_skill.split(','))*5 +
             sc.regional_score + sc.improve_plan + sc.skill_up
         )
-        # ---------------------------------------------------------
-        db.session.add(sc); db.session.commit()
+        db.session.add(sc)
+        db.session.commit()
         flash(f"スコアを登録しました。（合計 {sc.total} 点）")
         return redirect(url_for('score_list'))
 
-    return render_template('score_input.html')
+    return render_template('score_input.html', current_user=user)
+
 
 # ============================================================
 # スコア一覧
 # ============================================================
 @app.route('/score_list')
 def score_list():
-    if 'user_id' not in session: return redirect(url_for('login'))
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     user_scores = Score.query.filter_by(user_id=session['user_id']).order_by(Score.created_at.desc()).all()
     return render_template('score_list.html', scores=user_scores)
 
@@ -188,4 +203,7 @@ def help():
 # アプリ起動
 # ============================================================
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # DB テーブルがなければ作成
+
     app.run(debug=True)
