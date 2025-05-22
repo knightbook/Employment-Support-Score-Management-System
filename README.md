@@ -9,28 +9,42 @@
 
 ```text
 Employment-Support-Score-Management-System/
-|
-├── project/ # Flaskアプリ本体
-│ ├── app.py # メインアプリ
-│ ├── templates/ # HTMLテンプレート（Jinja2）
-│ └── static/ # CSS・画像など
-|
-├── docs/ # 設計・資料
-│ ├── wireframes/ # ワイヤーフレーム（drawio, png）
-│ ├── diagrams/ # クラス図・画面遷移図など
-│ └── gantt_schedule.xlsx # ガントチャート
-|
-└── README.md # このファイル
+│
+├── project/                  # Flaskアプリ本体
+│   ├── app.py               # メインアプリ
+│   ├── templates/           # HTMLテンプレート（Jinja2）
+│   ├── static/              # CSS・画像など
+│   └── blueprints/          # Flask Blueprint構成（ログイン、スコア管理など）
+│
+├── docs/                    # 設計・資料
+│   ├── wireframes/          # ワイヤーフレーム（drawio, png）
+│   ├── diagrams/            # クラス図・画面遷移図など
+│   └── gantt_schedule.xlsx  # ガントチャート
+│
+├── requirements.txt         # 必要パッケージ一覧
+└── README.md                # このファイル
 ```
 ---
 
 ## 🛠 使用技術
 
+### 🔙 バックエンド
 - **Python 3.x**
 - **Flask** – 軽量Webフレームワーク
-- **Jinja2** – テンプレートエンジン
-- **Bootstrap 5** – CSSスタイリング（CDN利用）
-- **SQLite** – 軽量DB
+- **Jinja2** – テンプレートエンジン（Flask組み込み）
+- **SQLite** – 軽量データベース（ファイルベース）
+- **SQLAlchemy** – ORM（オブジェクト関係マッピング）
+
+### 🎨 フロントエンド
+- **HTML5 / CSS3**
+- **Bootstrap 5** – モバイルファーストなCSSフレームワーク（CDN利用）
+- **JavaScript** – フォームバリデーションなどに利用予定
+
+### ⚙ その他・開発ツール
+- **Git / GitHub** – バージョン管理
+- **draw.io** – ワイヤーフレーム・図作成
+- **Excel / Googleスプレッドシート** – ガントチャート、仕様管理
+- **venv** – 仮想環境構築
 
 ---
 
@@ -38,9 +52,13 @@ Employment-Support-Score-Management-System/
 
 ```bash
 git clone https://github.com/knightbook/Employment-Support-Score-Management-System.git
+cd Employment-Support-Score-Management-System
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements.txt  # まだない場合は flask, sqlalchemy を手動でインストール
 cd project
-pip install -r requirements.txt  # ← 未作成の場合は flask だけでOK
 python app.py
+
 ```
 初期状態でアクセス：
 http://127.0.0.1:5000/
