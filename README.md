@@ -50,17 +50,29 @@ Employment-Support-Score-Management-System/
 
 ## 🚀 セットアップ手順（ローカル実行）
 
+1. このリポジトリをクローン
 ```bash
 git clone https://github.com/knightbook/Employment-Support-Score-Management-System.git
 cd Employment-Support-Score-Management-System
+```
+2.Python仮想環境を作成して有効化（推奨）
+```bash
 python -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
-pip install -r requirements.txt  # まだない場合は flask, sqlalchemy を手動でインストール
+# macOS/Linux環境は下記のコマンドをコピペ
+source venv/bin/activate
+# Windows (PowerShell)環境は下記のコマンドをコピペ
+venv\Scripts\Activate.ps1
+```
+3.依存パッケージをインストール
+```bash
+pip install -r requirements.txt
+```
+4.Flaskアプリのあるディレクトリに移動し起動
+```bash
 cd project
 python app.py
-
 ```
-初期状態でアクセス：
+5.ブラウザでアクセス
 http://127.0.0.1:5000/
 
 ---
