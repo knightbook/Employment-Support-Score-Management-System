@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -8,6 +8,36 @@ class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
 
+class User(db.Model):
+    id       = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    email    = db.Column(db.String(120))
+
+
+class Score(db.Model):
+    id              = db.Column(db.Integer, primary_key=True)
+    user_id         = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # 様式 2-1
+    working_hours   = db.Column(db.Integer, default=0)
+    production_res  = db.Column(db.Integer, default=0)
+    diversity       = db.Column(db.Text)     # CSV形式
+    support_skill   = db.Column(db.Text)     # CSV形式
+    regional_score  = db.Column(db.Integer, default=0)
+    improve_plan    = db.Column(db.Integer, default=0)
+    skill_up        = db.Column(db.Integer, default=0)
+
+    # 様式 2-2
+    num_users       = db.Column(db.Integer)
+    average_wage    = db.Column(db.Integer)
+    employment_rate = db.Column(db.Integer)
+    production_json = db.Column(db.Text)     # 年度別収支（JSON）
+
+    memo            = db.Column(db.Text)
+    inputter_name   = db.Column(db.String(100))
+    total           = db.Column(db.Integer, default=0)
 class ScoreRecord(db.Model):
     __tablename__ = 'score_records'
 

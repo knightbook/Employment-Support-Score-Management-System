@@ -30,7 +30,7 @@ Employment-Support-Score-Management-System/
 - **Flask** – 軽量Webフレームワーク
 - **Jinja2** – テンプレートエンジン
 - **Bootstrap 5** – CSSスタイリング（CDN利用）
-- **SQLite**（予定）– 軽量DB
+- **SQLite** – 軽量DB
 
 ---
 

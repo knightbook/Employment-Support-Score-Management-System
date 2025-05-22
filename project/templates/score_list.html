@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <title>スコア一覧</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .memo {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        a.button {
+            background-color: #007BFF;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            text-decoration: none;
+        }
+        a.button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>スコア一覧</h2>
+    <p><a href="{{ url_for('score_input') }}" class="button">新規入力</a></p>
+    <table>
+        <thead>
+            <tr>
+                <th>登録日時</th>
+                <th>稼働時間</th>
+                <th>生産結果</th>
+                <th>多様な働き方</th>
+                <th>支援力向上</th>
+                <th>地域連携</th>
+                <th>経営改善計画</th>
+                <th>知識・能力向上</th>
+                <th>利用者数</th>
+                <th>平均賃金</th>
+                <th>雇用率</th>
+                <th>備考</th>
+                <th>合計点</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for score in scores %}
+            <tr>
+                <td>{{ score.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ score.working_hours }}</td>
+                <td>{{ score.production_res }}</td>
+                <td>{% if score.diversity %}{{ score.diversity.replace(',', ', ') }}{% else %}-{% endif %}</td>
+                <td>{% if score.support_skill %}{{ score.support_skill.replace(',', ', ') }}{% else %}-{% endif %}</td>
+                <td>{{ score.regional_score }}</td>
+                <td>{{ score.improve_plan }}</td>
+                <td>{{ score.skill_up }}</td>
+                <td>{{ score.num_users }}</td>
+                <td>{{ score.average_wage }}</td>
+                <td>{{ score.employment_rate or '-' }}</td>
+                <td class="memo" title="{{ score.memo }}">{{ score.memo[:20] }}{% if score.memo|length > 20 %}...{% endif %}</td>
+                <td>{{ score.total }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="13">スコアの記録がありません。</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <title>スコア集計・グラフ表示</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>スコア集計・グラフ表示</h2>
+
+    <form method="get" action="{{ url_for('aggregate') }}">
+        <label>開始日:
+            <input type="date" name="start_date" value="{{ start_date }}" required />
+        </label>
+        <label>終了日:
+            <input type="date" name="end_date" value="{{ end_date }}" required />
+        </label>
+        <label>グラフ種類:
+            <select name="graph_type">
+                <option value="line"  {% if graph_type == 'line' %}selected{% endif %}>折れ線</option>
+                <option value="bar"   {% if graph_type == 'bar' %}selected{% endif %}>棒グラフ</option>
+                <option value="radar" {% if graph_type == 'radar' %}selected{% endif %}>レーダー</option>
+            </select>
+        </label>
+        <button type="submit">集計</button>
+    </form>
+
+    <p>合計スコア: {{ total_score }}</p>
+    <p>平均スコア: {{ "%.2f"|format(avg_score) }}</p>
+
+    <canvas id="scoreChart" width="800" height="400"></canvas>
+
+    <script>
+    const ctx = document.getElementById('scoreChart').getContext('2d');
+
+    const chartType = "{{ graph_type }}";
+    const labels = {{ dates | tojson }};
+    const data = {{ totals | tojson }};
+
+    const commonOptions = {
+        responsive: true,
+        plugins: {
+            legend: { display: true },
+            title:  { display: true, text: '日別合計スコア' }
+        }
+    };
+
+    const config = {
+        type: chartType,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'スコア',
+                data: data,
+                fill: chartType === 'radar',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgb(75, 192, 192)',
+                borderWidth: 2,
+                tension: 0.2
+            }]
+        },
+        options: chartType === 'radar' ? commonOptions : {
+            ...commonOptions,
+            scales: {
+                x: { title: { display: true, text: '日付' } },
+                y: { title: { display: true, text: 'スコア' }, beginAtZero: true }
+            }
+        }
+    };
+
+    new Chart(ctx, config);
+    </script>
+</body>
+</html>
