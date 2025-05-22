@@ -57,10 +57,11 @@ cd Employment-Support-Score-Management-System
 ```
 2.Python仮想環境を作成して有効化（推奨）
 ```bash
-python -m venv venv
-# macOS/Linux環境は下記のコマンドをコピペ
+python -m venv venv #←先ずはこちらをコマンド入力実行
+
+# macOS/Linux環境の方は下記のコマンドを入力実行
 source venv/bin/activate
-# Windows (PowerShell)環境は下記のコマンドをコピペ
+# Windows環境の方は下記のコマンドをコピペ
 venv\Scripts\Activate.ps1
 ```
 3.依存パッケージをインストール
