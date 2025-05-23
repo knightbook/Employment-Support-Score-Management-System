@@ -50,17 +50,17 @@ Employment-Support-Score-Management-System/
 
 ## 🚀 セットアップ手順（ローカル実行）
 
-1. このリポジトリをクローン
+### 1. このリポジトリをクローン
 ```bash
 git clone https://github.com/knightbook/Employment-Support-Score-Management-System.git
 cd Employment-Support-Score-Management-System
 ```
-2-1.Python仮想環境の作成（推奨）※全OS共通
+### 2-1.Python仮想環境の作成（推奨）※全OS共通
 ```bash
 python -m venv venv 
 ```
-2-2.Python仮想環境の有効化※実行環境毎にコマンドが違います
-### windows
+### 2-2.Python仮想環境の有効化※実行環境毎にコマンドが違います
+#### windows
 - PowerShell使用
 ```powershell
 venv\Scripts\Activate.ps1
@@ -77,7 +77,7 @@ venv\Scripts\activate.bat
 ```bash
 source venv/Scripts/activate
 ```
-### macOS / Linux
+#### macOS / Linux
 - bash / zsh などのシェル環境:
 ```bash
 source venv/bin/activate
@@ -87,16 +87,16 @@ source venv/bin/activate
 source venv/bin/activate.fish
 ```
 
-3.依存パッケージをインストール
+### 3.依存パッケージをインストール
 ```bash
 pip install -r requirements.txt
 ```
-4.Flaskアプリのあるディレクトリに移動し起動
+### 4.Flaskアプリのあるディレクトリに移動し起動
 ```bash
 cd project
 python app.py
 ```
-5.ブラウザでアクセス
+### 5.ブラウザでアクセス
 http://127.0.0.1:5000/
 ⚠ Python 3.8 以上を推奨（SQLAlchemyのバージョン対応のため）
 
