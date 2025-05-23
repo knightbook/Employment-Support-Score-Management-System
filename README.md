@@ -55,15 +55,38 @@ Employment-Support-Score-Management-System/
 git clone https://github.com/knightbook/Employment-Support-Score-Management-System.git
 cd Employment-Support-Score-Management-System
 ```
-2.Python仮想環境を作成して有効化（推奨）
+2-1.Python仮想環境の作成（推奨）※全OS共通
 ```bash
-python -m venv venv #←先ずはこちらをコマンド入力実行
-
-# macOS/Linux環境の方は下記のコマンドを入力実行
-source venv/bin/activate
-# Windows環境の方は下記のコマンドをコピペ
+python -m venv venv 
+```
+2-2.Python仮想環境の有効化※実行環境毎にコマンドが違います
+### windows
+- PowerShell使用
+```powershell
 venv\Scripts\Activate.ps1
 ```
+ 初回は「実行ポリシー制限」で止められる場合があります。以下を実行して一時的に解除：
+ ```powershell
+ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+ ```
+- コマンドプロンプト（cmd.exe）:
+```cmd
+venv\Scripts\activate.bat
+```
+- Git Bash / MSYS2 / MINGW64:
+```bash
+source venv/Scripts/activate
+```
+### macOS / Linux
+- bash / zsh などのシェル環境:
+```bash
+source venv/bin/activate
+```
+- fishシェルの方は以下のように：
+```bash
+source venv/bin/activate.fish
+```
+
 3.依存パッケージをインストール
 ```bash
 pip install -r requirements.txt
