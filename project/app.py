@@ -84,30 +84,35 @@ def score_input():
 
     user = User.query.get(session["user_id"])
 
+    def safe_int(value):
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return 0
+
     if request.method == "POST":
-        # 年度別収支を JSON にまとめる
         production_json = {}
         for i in (1, 2, 3):
             production_json[f"year_{i}"] = request.form.get(f"year_{i}", "")
-            production_json[f"income_{i}"] = int(request.form.get(f"income_{i}", 0))
-            production_json[f"wage_{i}"] = int(request.form.get(f"wage_{i}", 0))
+            production_json[f"income_{i}"] = safe_int(request.form.get(f"income_{i}"))
+            production_json[f"wage_{i}"] = safe_int(request.form.get(f"wage_{i}"))
             production_json[f"note_income_{i}"] = request.form.get(f"note_income_{i}", "")
 
         sc = Score(
-            user_id        = session["user_id"],
-            working_hours  = int(request.form.get("working_hours", 0)),
-            production_res = int(request.form.get("production_result", 0)),
-            diversity      = ",".join(request.form.getlist("diversity[]")),
-            support_skill  = ",".join(request.form.getlist("support_skill[]")),
-            regional_score = int(request.form.get("regional_activity_checked") or 0),
-            improve_plan   = int(request.form.get("improve_plan", 0)),
-            skill_up       = int(request.form.get("user_skill_up", 0)),
-            num_users      = int(request.form.get("num_users", 0)),
-            average_wage   = int(request.form.get("average_wage", 0)),
-            employment_rate= int(request.form.get("employment_rate", 0)),
-            production_json= json.dumps(production_json, ensure_ascii=False),
-            memo           = request.form.get("memo", ""),
-            inputter_name  = request.form.get("inputter_name", "")
+            user_id         = session["user_id"],
+            working_hours   = safe_int(request.form.get("working_hours")),
+            production_res  = safe_int(request.form.get("production_result")),
+            diversity       = ",".join(request.form.getlist("diversity[]")),
+            support_skill   = ",".join(request.form.getlist("support_skill[]")),
+            regional_score  = safe_int(request.form.get("regional_activity_checked")),
+            improve_plan    = safe_int(request.form.get("improve_plan")),
+            skill_up        = safe_int(request.form.get("user_skill_up")),
+            num_users       = safe_int(request.form.get("num_users")),
+            average_wage    = safe_int(request.form.get("average_wage")),
+            employment_rate = safe_int(request.form.get("employment_rate")),
+            production_json = json.dumps(production_json, ensure_ascii=False),
+            memo            = request.form.get("memo", ""),
+            inputter_name   = request.form.get("inputter_name", "")
         )
 
         sc.total = (
@@ -122,7 +127,6 @@ def score_input():
         return redirect(url_for("score_list"))
 
     return render_template("score_input.html", current_user=user)
-
 
 # ------------------------------------------------------------------
 # スコア一覧

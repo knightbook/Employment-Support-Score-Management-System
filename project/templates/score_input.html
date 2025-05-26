@@ -66,13 +66,13 @@
     }
     </script>
     <!-- ======== 様式 2‑1 追加分 ====================================== -->
- <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-1 就労継続支援Ａ型事業所におけるスコア表（全体）</h2>
+    <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-1 就労継続支援Ａ型事業所におけるスコア表（全体）</h2>
     <!-- 労働時間 -->
     <fieldset class="mb-4">
       <legend>Ⅰ. 労働時間</legend>
       <div class="mb-3">
         <label for="working_hours" class="form-label">1日の平均労働時間</label>
-        <select name="working_hours" id="working_hours" class="form-select" required>
+        <select name="working_hours" id="working_hours" class="form-select" required onchange="updateScore()">
           <option value="">選択してください</option>
           <option value="90">① 7時間以上</option>
           <option value="80">② 6～7時間未満</option>
@@ -83,15 +83,36 @@
           <option value="20">⑦ 2～3時間未満</option>
           <option value="5">⑧ 2時間未満</option>
         </select>
+          <div class="mt-2">
+            <strong>小計点数: </strong><span id="subtotal_score">0</span> 点
+          </div>
       </div>
     </fieldset>
+
+    <script>
+      function updateScore() {
+        const select = document.getElementById('working_hours');
+        const scoreDisplay = document.getElementById('subtotal_score');
+        const selectedValue = select.value;
+        if (selectedValue) {
+          scoreDisplay.textContent = selectedValue;
+        } else {
+          scoreDisplay.textContent = '0';
+        }
+        updateTotalScore(); // 合計点数も更新
+      }
+
+      // ページ読み込み時にも初期表示を設定
+      window.onload = updateScore;
+    </script>
+
 
     <!-- 生産活動 -->
     <fieldset class="mb-4">
       <legend>Ⅱ. 生産活動</legend>
       <div class="mb-3">
         <label for="production_result" class="form-label">生産活動収支状況（過去3年）</label>
-        <select name="production_result" id="production_result" class="form-select" required>
+        <select name="production_result" id="production_result" class="form-select" required onchange="updateProductionScore()">
           <option value="">選択してください</option>
           <option value="60">① 3年すべて黒字</option>
           <option value="50">② 2年黒字</option>
@@ -100,214 +121,833 @@
           <option value="-10">⑤ 2年赤字</option>
           <option value="-20">⑥ 3年赤字</option>
         </select>
+        <div class="mt-2">
+          <strong>小計点数: </strong><span id="production_subtotal_score">---</span> 点
+        </div>
       </div>
     </fieldset>
+
+    <script>
+      function updateProductionScore() {
+        const select = document.getElementById('production_result');
+        const scoreDisplay = document.getElementById('production_subtotal_score');
+        const selectedValue = select.value;
+        if (selectedValue) {
+          scoreDisplay.textContent = selectedValue;
+        } else {
+         scoreDisplay.textContent = '0';
+        }
+        updateTotalScore(); // 合計点数も更新
+      }
+
+      // ページ読み込み時の初期表示
+      window.onload = function() {
+        updateProductionScore();
+      };
+    </script>
 
     <!-- 多様な働き方 -->
     <fieldset class="mb-4">
       <legend>Ⅲ. 多様な働き方（該当するものすべてにチェック）</legend>
+  
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="diversity[]" value="license" id="license">
-        <label class="form-check-label" for="license">免許・資格取得支援制度</label>
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="license" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="license">①免許・資格取得支援制度※就業規則等で定めている</label>
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="diversity[]" value="promotion" id="promotion">
-        <label class="form-check-label" for="promotion">職員への登用制度</label>
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="promotion" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="promotion">②職員への登用制度※就業規則等で定めている</label>
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="diversity[]" value="sidejob" id="sidejob">
-        <label class="form-check-label" for="sidejob">副業・兼業の容認</label>
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="sidejob1" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="sidejob1">③副業・兼業の容認※就業規則等で定めている</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="flextime" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="flextime">④フレックスタイム制に係る労働条件※就業規則等で定めている</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="shorttime" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="shorttime">⑤短縮時間勤務に係る労働条件※就業規則等で定めている</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="staggered" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="staggered">⑥時差出勤制度に係る労働条件※就業規則等で定めている</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="paidleave" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="paidleave">⑦有給休暇の時間単位取得又は計画的付与制度※就業規則等で定めている</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" value="1" id="sickleave" onchange="updateDiversityScore()">
+        <label class="form-check-label" for="sickleave">⑧傷病休暇等の取得に関する事項※就業規則等で定めている</label>
+      </div>
+
+      <div class="mt-2">
+        <strong>小計点数: </strong><span id="diversity_subtotal_score">0</span> 点
       </div>
     </fieldset>
+
+    <script>
+    function updateDiversityScore() {
+      const checkboxes = document.querySelectorAll('input[name="diversity[]"]');
+      let checkedCount = 0;
+      checkboxes.forEach(cb => {
+        if(cb.checked) checkedCount++;
+      });
+
+      let score = 0;
+      if (checkedCount >= 5) {
+        score = 15;
+      } else if (checkedCount >= 3) {
+        score = 5;
+      } else {
+        score = 0;
+      }
+
+      document.getElementById('diversity_subtotal_score').textContent = score;
+      updateTotalScore(); // 合計点数も更新
+    }
+    </script>
+
 
     <!-- 支援力向上 -->
     <fieldset class="mb-4">
       <legend>Ⅳ. 支援力向上</legend>
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="support_skill[]" value="training" id="training">
-        <label class="form-check-label" for="training">外部研修の受講</label>
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="training" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="training">①研修計画に基づいた外部研修会又は内部研修会</label>
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="support_skill[]" value="seminar" id="seminar">
-        <label class="form-check-label" for="seminar">学会・勉強会参加</label>
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="seminar" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="seminar">②研修、学会等又は学会誌等において発表</label>
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="support_skill[]" value="eval_system" id="eval_system">
-        <label class="form-check-label" for="eval_system">評価制度の導入</label>
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="inspection" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="inspection">③視察・実習の実施又は受け入れ</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="trade_meeting" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="trade_meeting">④販路拡大の商談会等への参加</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="evaluation_system" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="evaluation_system">⑤職員の人事評価制度</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="peer_supporter" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="peer_supporter">⑥ピアサポーターの配置</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="third_party_evaluation" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="third_party_evaluation">⑦第三者評価</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="support_skill[]" value="1" id="certification" onchange="updateSupportSkillScore()">
+        <label class="form-check-label" for="certification">⑧国際標準化企画が定めた規格等の認証等</label>
+      </div>
+
+      <div class="mt-2">
+        <strong>小計点数: </strong><span id="support_skill_subtotal_score">0</span> 点
       </div>
     </fieldset>
 
+    <script>
+    function updateSupportSkillScore() {
+      const checkboxes = document.querySelectorAll('input[name="support_skill[]"]');
+      let checkedCount = 0;
+      checkboxes.forEach(cb => {
+        if(cb.checked) checkedCount++;
+      });
+
+      let score = 0;
+      if (checkedCount >= 5) {
+        score = 15;
+      } else if (checkedCount >= 3) {
+        score = 5;
+      } else {
+        score = 0;
+      }
+
+      document.getElementById('support_skill_subtotal_score').textContent = score;
+      updateTotalScore(); // 合計点数も更新
+    }
+    </script>
+
+
     <!-- Ⅴ. 地域連携活動 ------------------------------------------------>
-<fieldset class="mb-4">
-  <legend>Ⅴ. 地域連携活動</legend>
-  <p class="small text-muted mb-2">活動があればチェック（1項目10点）</p>
+    <fieldset class="mb-4">
+      <legend>Ⅴ. 地域連携活動</legend>
+      <p class="small text-muted mb-2">活動があればチェック（1事例以上あれば10点）</p>
 
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox"
-           name="regional_activity[]" value="10" id="ra_dev">
-    <label class="form-check-label" for="ra_dev">
-      地域と連携した新商品開発や生産活動（結果を公表）
-    </label>
-  </div>
-</fieldset>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox"
+              name="regional_activity[]" value="10" id="ra_dev" onchange="updateRegionalActivityScore()">
+        <label class="form-check-label" for="ra_dev">
+          地域と連携した新商品開発や生産活動（結果を公表）
+        </label>
+      </div>
 
-<!-- Ⅵ. 経営改善計画 --------------------------------------------->
-<fieldset class="mb-4">
-  <legend>Ⅵ. 経営改善計画</legend>
-  <div class="mb-3">
-    <label class="form-label d-block mb-1">経営改善計画の提出状況</label>
+      <div class="mt-2">
+        <strong>小計点数: </strong><span id="regional_activity_subtotal_score">0</span> 点
+      </div>
+    </fieldset>
 
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="improve_plan"
-             value="0" id="plan_not_required" required>
-      <label class="form-check-label" for="plan_not_required">
-        提出を求められていない／期限内に提出済み（0点）
-      </label>
+    <script>
+    function updateRegionalActivityScore() {
+      const checkboxes = document.querySelectorAll('input[name="regional_activity[]"]');
+      let checked = false;
+      checkboxes.forEach(cb => {
+        if(cb.checked) checked = true;
+      });
+
+      const score = checked ? 10 : 0;
+      document.getElementById('regional_activity_subtotal_score').textContent = score;
+      updateTotalScore(); // 合計点数も更新
+    }
+    </script>
+
+    <!-- Ⅵ. 経営改善計画 --------------------------------------------->
+    <fieldset class="mb-4">
+      <legend>Ⅵ. 経営改善計画</legend>
+      <div class="mb-3">
+        <label class="form-label d-block mb-1">経営改善計画の提出状況</label>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="improve_plan"
+                value="0" id="plan_not_required" required onchange="updateImprovePlanScore()">
+          <label class="form-check-label" for="plan_not_required">
+            提出を求められていない／期限内に提出済み（0点）
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="improve_plan"
+                value="-50" id="plan_late" onchange="updateImprovePlanScore()">
+          <label class="form-check-label" for="plan_late">
+            期限内に提出していない（‑50点）
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <strong>小計点数: </strong><span id="improve_plan_subtotal_score">0</span> 点
+      </div>
+    </fieldset>
+
+    <script>
+    function updateImprovePlanScore() {
+      const radios = document.getElementsByName('improve_plan');
+      let score = 0;
+      for(let radio of radios) {
+        if(radio.checked) {
+          score = parseInt(radio.value);
+          break;
+        }
+      }
+      document.getElementById('improve_plan_subtotal_score').textContent = score;
+      updateTotalScore(); // 合計点数も更新
+    }
+    </script>
+
+    <!-- Ⅶ. 利用者の知識・能力向上 ------------------------------------->
+    <fieldset class="mb-4">
+      <legend>Ⅶ. 利用者の知識・能力向上</legend>
+      <p class="small text-muted mb-2">
+        具体的支援を行い報告書を公表している場合は 10 点
+      </p>
+
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="user_skill_up"
+              value="10" id="skillup_yes" required onchange="updateUserSkillUpScore()">
+        <label class="form-check-label" for="skillup_yes">
+          支援を実施し報告書を公表している（10点）
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="user_skill_up"
+              value="0" id="skillup_no" onchange="updateUserSkillUpScore()">
+        <label class="form-check-label" for="skillup_no">
+          実施・公表していない（0点）
+        </label>
+      </div>
+
+      <div>
+        <strong>小計点数: </strong><span id="user_skill_up_subtotal_score">0</span> 点
+      </div>
+    </fieldset>
+
+    <script>
+    function updateUserSkillUpScore() {
+      const radios = document.getElementsByName('user_skill_up');
+      let score = 0;
+      for (const radio of radios) {
+        if (radio.checked) {
+          score = parseInt(radio.value);
+          break;
+        }
+      }
+      document.getElementById('user_skill_up_subtotal_score').textContent = score;
+      updateTotalScore(); // 合計点数も更新
+    }
+    </script>
+
+    <!--  様式2-1の合計点数を表示　----------------------------->
+    <div class="mt-4 border-top pt-3">
+      <h4>様式2-1合計点数: <span id="total_score_display">0</span> 点</h4>
     </div>
+    <script>
+    function updateTotalScore() {
+      // 各小計の要素ID（必要に応じて追加）
+      const subtotalIds = [
+        'subtotal_score',                   // 労働時間
+        'production_subtotal_score',        // 生産活動
+        'diversity_subtotal_score',         // 多様な働き方
+        'support_skill_subtotal_score',     // 支援力向上
+        'regional_activity_subtotal_score', // 地域連携活動
+        'improve_plan_subtotal_score',      // 経営改善計画
+        'user_skill_up_subtotal_score'      // 利用者の知識・能力向上
+      ];
 
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="improve_plan"
-             value="-50" id="plan_late">
-      <label class="form-check-label" for="plan_late">
-        期限内に提出していない（‑50点）
-      </label>
-    </div>
-  </div>
-</fieldset>
+      let total = 0;
+      subtotalIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          const val = parseInt(el.textContent);
+          if (!isNaN(val)) {
+            total += val;
+          }
+        }
+      });
 
-<!-- Ⅶ. 利用者の知識・能力向上 ------------------------------------->
-<fieldset class="mb-4">
-  <legend>Ⅶ. 利用者の知識・能力向上</legend>
-  <p class="small text-muted mb-2">
-    具体的支援を行い報告書を公表している場合は 10 点
-  </p>
+      // 合計を表示
+      document.getElementById('total_score_display').textContent = total;
+    }
 
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="user_skill_up"
-           value="10" id="skillup_yes" required>
-    <label class="form-check-label" for="skillup_yes">
-      支援を実施し報告書を公表している（10点）
-    </label>
-  </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="user_skill_up"
-           value="0" id="skillup_no">
-    <label class="form-check-label" for="skillup_no">
-      実施・公表していない（0点）
-    </label>
-  </div>
-</fieldset>
-<!-- ======== 様式 2‑2 追加分 ====================================== -->
- <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-2 就労継続支援Ａ型事業所におけるスコア表（実績Ⅰ～Ⅳ、Ⅵ）</h2>
-<!-- （Ⅰ） 利用者・平均工賃などの基本実績情報 ---------------------->
-<fieldset class="mb-4">
-  <legend>Ⅰ. 利用者・工賃等 実績</legend>
-  <div class="row g-3">
-    <div class="col-md-4">
-      <label for="num_users" class="form-label">利用者数（人）</label>
-      <input type="number" class="form-control" id="num_users" name="num_users" required>
-    </div>
-    <div class="col-md-4">
-      <label for="average_wage" class="form-label">平均工賃（月額・円）</label>
-      <input type="number" class="form-control" id="average_wage" name="average_wage" required>
-    </div>
-    <div class="col-md-4">
-      <label for="employment_rate" class="form-label">一般就労への移行者数（人）</label>
-      <input type="number" class="form-control" id="employment_rate" name="employment_rate">
-    </div>
-  </div>
-</fieldset>
+    // すべての小計更新後に合計も更新する
+    function updateAllScores() {
+      updateScore();                      // 労働時間の小計更新
+      updateProductionScore();            // 生産活動
+      updateDiversityScore();            // 多様な働き方
+      updateSupportSkillScore();         // 支援力向上
+      updateRegionalActivityScore();     // 地域連携活動
+      updateImprovePlanScore();          // 経営改善計画
+      updateUserSkillUpScore();          // 利用者の知識・能力向上
+      updateTotalScore();                // 最後に合計
+    }
 
-<!-- 生産活動（年度収支） ---------------------------------------->
-<fieldset class="mb-4">
-  <legend>Ⅱ. 生産活動 ‑ 年度別収支</legend>
-  <p class="small text-muted">直近3年度分を入力</p>
+    // ページ読み込み時にも計算
+    window.onload = updateAllScores;
+    </script>
 
-  <table class="table table-sm align-middle">
-    <thead class="table-light">
-      <tr>
-        <th style="width:18%">年度</th>
-        <th style="width:28%">生産活動収支額 <br><span class="small">(収入‑経費)</span></th>
-        <th style="width:28%">利用者へ支払った賃金総額</th>
-        <th style="width:26%">備考</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for y in [1,2,3] %}
-      <tr>
-        <td>
-          <input type="text" class="form-control" name="year_{{ y }}" placeholder="例：2024">
-        </td>
-        <td>
-          <input type="number" class="form-control" name="income_{{ y }}" step="1">
-        </td>
-        <td>
-          <input type="number" class="form-control" name="wage_{{ y }}" step="1">
-        </td>
-        <td>
-          <input type="text" class="form-control" name="note_income_{{ y }}">
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</fieldset>
 
-<!-- Ⅲ. 多様な働き方（詳細欄） ----------------------------------->
-<fieldset class="mb-4">
-  <legend>Ⅲ. 多様な働き方 具体的取組</legend>
-  <p class="small text-muted">
-    例：免許・資格取得支援、職員登用制度、在宅勤務規程など
-  </p>
-  <textarea name="diversity_desc" class="form-control" rows="3"></textarea>
-</fieldset>
+    <!-- ======== 様式 2‑2 追加分 ====================================== -->
+    <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-2 就労継続支援Ａ型事業所におけるスコア表（実績Ⅰ～Ⅳ、Ⅵ）</h2>
+    <!-- （Ⅰ） 利用者・平均工賃などの基本実績情報 ---------------------->
+    <fieldset class="mb-4">
+      <legend>Ⅰ. 労働時間</legend>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="num_users" class="form-label">労働時間</label>
+          <div class="input-group">
+            <input type="number" class="form-control" id="num_users" name="num_users" required>
+            <span class="input-group-text">時間</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label for="average_wage" class="form-label">雇用契約を締結していた延べ利用者数</label>
+          <div class="input-group">
+            <input type="number" class="form-control" id="average_wage" name="average_wage" required>
+            <span class="input-group-text">人</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label for="employment_rate" class="form-label">利用者の1日の平均労働時間数</label>
+          <div class="input-group">
+            <input type="number" class="form-control" id="employment_rate" name="employment_rate">
+            <span class="input-group-text">時間</span>
+          </div>
+        </div>
+      </div>
+    </fieldset>
 
-<!-- Ⅳ. 支援力向上（詳細欄） ------------------------------------->
-<fieldset class="mb-4">
-  <legend>Ⅳ. 支援力向上 具体的取組</legend>
-  <p class="small text-muted">
-    例：研修計画、学会発表、視察受入、人事評価制度、ピアサポーター配置等
-  </p>
-  <textarea name="support_desc" class="form-control" rows="3"></textarea>
-</fieldset>
+    <!-- 生産活動（年度収支） ---------------------------------------->
+    <fieldset class="mb-4">
+      <legend>Ⅱ. 生産活動 ‑ 年度別収支</legend>
+      <p class="small text-muted">直近3年度分を入力</p>
+      <table class="table table-sm align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width:18%">年度</th>
+            <th style="width:28%">生産活動収入から経費を除いた額</th>
+            <th style="width:28%">利用者に支払った賃金総額</th>
+            <th style="width:26%">収支（自動計算されます）</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for y in [1, 2, 3] %}
+          <tr>
+            <td>
+              <div class="input-group">
+                <input type="text" class="form-control" name="year_{{ y }}" placeholder="例：2024" oninput="addYearLabel(this)">
+                <span class="input-group-text">年</span>
+              </div>
+            </td>
+            <td>
+              <div class="input-group">
+                <input type="number" class="form-control" id="income_{{ y }}" name="income_{{ y }}" step="1" oninput="calculateBalance({{ y }})">
+                <span class="input-group-text" id="income_label_{{ y }}">円</span>
+              </div>
+            </td>
+            <td>
+              <div class="input-group">
+                <input type="number" class="form-control" id="wage_{{ y }}" name="wage_{{ y }}" step="1" oninput="calculateBalance({{ y }})">
+                <span class="input-group-text" id="wage_label_{{ y }}">円</span>
+              </div>
+            </td>
+            <td>
+              <input type="text" class="form-control" id="balance_{{ y }}" name="note_income_{{ y }}" readonly>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
 
-<!-- Ⅴ. 地域連携活動（チェック＆詳細） --------------------------->
-<fieldset class="mb-4">
-  <legend>Ⅴ. 地域連携活動</legend>
-  <div class="form-check mb-2">
-    <input class="form-check-input" type="checkbox" id="ra_checked"
-           name="regional_activity_checked" value="10">
-    <label class="form-check-label" for="ra_checked">
-      地域連携の生産活動や商品開発を行い結果を公表した（10点）
-    </label>
-  </div>
-  <textarea name="regional_activity_desc" class="form-control" rows="2"
-            placeholder="活動内容・公表URL等"></textarea>
-</fieldset>
+    <script>
+    function calculateBalance(y) {
+      const income = parseInt(document.getElementById(`income_${y}`).value) || 0;
+      const wage = parseInt(document.getElementById(`wage_${y}`).value) || 0;
+      const balance = income - wage;
+      document.getElementById(`balance_${y}`).value = balance.toLocaleString() + ' 円';
+    }
+    </script>
 
-<!-- Ⅵ. 経営改善計画（既存ラジオに詳細欄追加） ------------------->
-<fieldset class="mb-4">
-  <legend>Ⅵ. 経営改善計画 詳細</legend>
-  <p class="small text-muted">必要に応じて提出状況や備考を入力</p>
-  <textarea name="plan_desc" class="form-control" rows="2"></textarea>
-</fieldset>
+    <!-- Ⅲ. 多様な働き方（詳細欄） ----------------------------------->
+    <fieldset class="mb-4">
+      <legend>Ⅲ. 多様な働き方（該当するものすべてにチェック）</legend>
 
-<!-- Ⅶ. 利用者の知識・能力向上（詳細欄） ------------------------>
-<fieldset class="mb-4">
-  <legend>Ⅶ. 利用者の知識・能力向上 具体的支援</legend>
-  <textarea name="skillup_desc" class="form-control" rows="3"></textarea>
-</fieldset>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="license">
+        <label class="form-check-label" for="license">①免許・資格取得支援制度</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="promotion">
+        <label class="form-check-label" for="promotion">②職員への登用制度</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="sidejob1">
+        <label class="form-check-label" for="sidejob1">③副業・兼業の容認</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="flextime">
+        <label class="form-check-label" for="flextime">④フレックスタイム制に係る労働条件</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="shorttime">
+        <label class="form-check-label" for="shorttime">⑤短縮時間勤務に係る労働条件</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="staggered">
+        <label class="form-check-label" for="staggered">⑥時差出勤制度に係る労働条件</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="paidleave">
+        <label class="form-check-label" for="paidleave">⑦有給休暇の時間単位取得又は計画的付与制度</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="diversity[]" id="sickleave">
+        <label class="form-check-label" for="sickleave">⑧傷病休暇等の取得に関する事項</label>
+      </div>
+    </fieldset>
 
-    <!-- 備考 -->
-    <div class="mb-4">
-      <label for="memo" class="form-label">備考</label>
-      <textarea name="memo" id="memo" class="form-control" rows="3"></textarea>
-    </div>
+    <!-- Ⅳ. 支援力向上（詳細欄） ------------------------------------->
+    <fieldset class="mb-4">
+      <legend>Ⅳ. 支援力向上（チェックを入れると詳細入力欄が出てきます）</legend>
+      <!-- ①研修計画に基づいた外部研修会又は内部研修会 -->
+      <div class="mb-3">
+        <h6>①研修計画に基づいた外部研修会又は内部研修会</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="training_plan">
+          <label class="form-check-label" for="training_plan">◎研修計画を策定している</label>
+        </div>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="presentation_seminar"
+                onchange="toggleInputs(this, 'presentation_seminar_inputs')">
+          <label class="form-check-label" for="presentation_seminar">
+            ◎研修、学会等又は学会誌等において発表している
+          </label>
+          <fieldset class="border p-2 mb-3 mt-2 ms-4" id="presentation_seminar_inputs" style="display: none;">
+            <label>研修・学会名：
+              <input type="text" name="seminar_name" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>発表テーマ：
+              <input type="text" name="presentation_theme" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>実施日：
+              <input type="date" name="presentation_date" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>参加者数：
+              <input type="number" name="participants_count" class="form-control form-control-sm" min="1" disabled>
+            </label>
+          </fieldset>
+        </div>
+      </div>
 
-    <!-- 登録ボタン -->
-    <div class="text-center mt-4">
-        <button type="submit" class="btn btn-primary px-5">登録する</button>
-    </div>
+      <script>
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+
+        if (checkbox.checked) {
+          container.style.display = 'block';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          container.style.display = 'none';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+
+      <!-- ②研修、学会等又は学会誌等において発表 -->
+      <div class="mb-3">
+        <h6>②研修、学会等又は学会誌等において発表</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="presentation_seminar"
+                onchange="toggleInputs(this, 'presentation_inputs')">
+          <label class="form-check-label" for="presentation_seminar">
+            ◎研修、学会等又は学会誌等において1回以上発表している
+          </label>
+          <div class="mt-2 ms-4" id="presentation_inputs" style="display: none;">
+            <fieldset class="border p-2 mb-3">
+              <legend class="fs-6">研修・学会</legend>
+              <label>研修・学会名：
+                <input type="text" name="seminar_name" class="form-control form-control-sm" disabled>
+              </label><br>
+              <label>実施日：
+                <input type="date" name="seminar_date" class="form-control form-control-sm" disabled>
+              </label>
+            </fieldset>
+            <fieldset class="border p-2">
+              <legend class="fs-6">学会誌等</legend>
+              <label>学会誌等名：
+                <input type="text" name="journal_name" class="form-control form-control-sm" disabled>
+              </label><br>
+              <label>実施日：
+                <input type="date" name="journal_date" class="form-control form-control-sm" disabled>
+              </label><br>
+              <label class="mt-3">発表テーマ：
+                <input type="text" name="presentation_theme" class="form-control form-control-sm" disabled>
+              </label>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+        if (checkbox.checked) {
+          container.style.display = 'block';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          container.style.display = 'none';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+
+      <!-- ③視察・実習の実施又は受け入れ-------->
+      <div class="mb-3">
+        <h6>③視察・実習の実施又は受け入れ</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="advanced_visits" onclick="toggleVisitInputs()">
+          <label class="form-check-label" for="advanced_visits">
+            ◎先進的事業者の視察・実習を実施または受け入れている<br>
+            もしくは、他の事業所の視察・実習を受け入れている
+          </label>
+          <div class="mt-2 ms-4" id="visit_inputs" style="display: none;">
+            <fieldset class="border p-2 mb-3">
+              <legend class="fs-6">先進的事業所</legend>
+              <label>事業所名：
+                <input type="text" name="advanced_office" class="form-control form-control-sm" disabled>
+              </label><br>
+              <label>実施日：
+                <input type="date" name="advanced_visit_date" class="form-control form-control-sm" disabled>
+              </label>
+              <label>参加者数：
+                <input type="number" name="advanced_participants_count" class="form-control form-control-sm" min="1" disabled>
+              </label>
+            </fieldset>
+            <fieldset class="border p-2">
+              <legend class="fs-6">他の事業所</legend>
+              <label>事業所名：
+                <input type="text" name="other_office" class="form-control form-control-sm" disabled>
+              </label><br>
+              <label>実施日：
+                <input type="date" name="other_visit_date" class="form-control form-control-sm" disabled>
+              </label>
+              <label>参加者数：
+                <input type="number" name="other_participants_count" class="form-control form-control-sm" min="1" disabled>
+              </label>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      function toggleVisitInputs() {
+        const checkbox = document.getElementById("advanced_visits");
+        const inputsDiv = document.getElementById("visit_inputs");
+        const inputs = inputsDiv.querySelectorAll("input");
+        if (checkbox.checked) {
+          inputsDiv.style.display = "block";
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          inputsDiv.style.display = "none";
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+
+      <!-- ④販路拡大の商談会等への参加 -->
+      <div class="mb-3">
+        <h6>④販路拡大の商談会等への参加</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="business_meeting"
+                onchange="toggleInputs(this, 'business_meeting_inputs')">
+          <label class="form-check-label" for="business_meeting">
+            ◎販路拡大の商談会や展示会等へ１回以上参加している
+          </label>
+          <fieldset class="border p-2 mt-2 ms-4" id="business_meeting_inputs" style="display: none;">
+            <label>商談会等名：
+              <input type="text" name="meeting_name" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>主催者名：
+              <input type="text" name="organizer" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>日時：
+              <input type="date" name="meeting_date" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>内容：
+              <input type="text" name="meeting_content" class="form-control form-control-sm" disabled>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+
+      <script>
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+        if (checkbox.checked) {
+          container.style.display = 'block';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          container.style.display = 'none';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+
+      <!-- ⑤職員の人事評価制度 -->
+      <div class="mb-3">
+        <h6>⑤職員の人事評価制度</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="evaluation_system_setup"
+                onchange="toggleInputs(this, 'evaluation_inputs')">
+          <label class="form-check-label" for="evaluation_system_setup">
+            ◎職員の人事評価制度を整備している
+          </label><br>
+          <input class="form-check-input" type="checkbox" id="evaluation_system_notice">
+          <label class="form-check-label" for="evaluation_system_notice">
+            ◎職員の人事評価制度を周知している
+          </label>
+          <fieldset class="border p-2 mt-2 ms-4" id="evaluation_inputs" style="display: none;">
+            <label>人事評価制度の制定日：
+              <input type="month" name="evaluation_date" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>人事評価制度の対象職員数：
+              <input type="number" name="target_staff" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>うち昇給・昇格を行った者：
+              <input type="number" name="promoted" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>当該人事評価制度の周知方法：
+              <input type="text" name="notification_method" class="form-control form-control-sm" disabled>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+
+      <script>
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+        if (checkbox.checked) {
+          container.style.display = 'block';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          container.style.display = 'none';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+
+      <!-- ⑥ピアサポーターの配置 -->
+      <div class="mb-3">
+        <h6>⑥ピアサポーターの配置</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="peer_supporter_placement"
+                onchange="toggleInputs(this, 'peer_supporter_inputs')">
+          <label class="form-check-label" for="peer_supporter_placement">
+            ◎ピアサポーターを配置している
+          </label><br>
+          <input class="form-check-input" type="checkbox" id="peer_supporter_training">
+          <label class="form-check-label" for="peer_supporter_training">
+            ◎当該ピアサポーターは「障害者ピアサポート研修」を受講している
+          </label>
+          <fieldset class="border p-2 mt-2 ms-4" id="peer_supporter_inputs" style="display: none;">
+            <label>配置期間：
+              <input type="date" name="peer_start" disabled> ～ 
+              <input type="date" name="peer_end" disabled>
+            </label><br>
+            <label>就業時間：
+              <input type="text" name="peer_hours" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>職務内容：
+              <input type="text" name="peer_duties" class="form-control form-control-sm" disabled>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+
+      <script>
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+        if (checkbox.checked) {
+          container.style.display = 'block';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          container.style.display = 'none';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+
+      <!-- ⑦第三者評価 -->
+      <div class="mb-3">
+        <h6>⑦第三者評価</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="third_party_evaluation"
+                onchange="toggleInputs(this, 'third_party_evaluation_inputs')">
+          <label class="form-check-label" for="third_party_evaluation">
+            ◎前年度末日から３年以内に福祉サービス第三者評価を受けている
+          </label>
+          <fieldset class="border p-2 mt-2 ms-4" id="third_party_evaluation_inputs" style="display: none;">
+            <label>評価を受けた日：
+              <input type="date" name="evaluation_date" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>第三者機関名：
+              <input type="text" name="evaluation_org" class="form-control form-control-sm" disabled>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+
+      <script>
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+        if (checkbox.checked) {
+          container.style.display = 'block';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          container.style.display = 'none';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+
+      <!-- ⑧国際標準化企画が定めた規格等の認証等 -->
+      <div class="mb-3">
+        <h6>⑧国際標準化企画が定めた規格等の認証等</h6>
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="certification"
+                onchange="toggleInputs(this, 'certification_inputs')">
+          <label class="form-check-label" for="certification">
+            ◎ISOが制定したマネジメント規格等の認証等を受けている
+          </label>
+          <fieldset class="border p-2 mt-2 ms-4" id="certification_inputs" style="display: none;">
+            <label>認証を受けた日：
+              <input type="date" name="certification_date" class="form-control form-control-sm" disabled>
+            </label><br>
+            <label>規格等の内容：
+              <input type="text" name="certification_content" class="form-control form-control-sm" disabled>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+
+      <script>
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+        if (checkbox.checked) {
+          container.style.display = 'block';
+          inputs.forEach(input => input.disabled = false);
+        } else {
+          container.style.display = 'none';
+          inputs.forEach(input => input.disabled = true);
+        }
+      }
+      </script>
+    </fieldset>
+
+    <!-- Ⅵ. 経営改善計画（既存ラジオに詳細欄追加） ------------------->
+    <fieldset class="mb-4">
+      <legend>Ⅵ. 経営改善計画（チェックを入れると詳細入力欄が出てきます）</legend>
+      <div class="form-check mb-2">
+        <input class="form-check-input" type="checkbox" id="improvement_plan"
+              onchange="toggleInputs(this, 'improvement_plan_inputs')">
+        <label class="form-check-label" for="improvement_plan">
+          ◎指定権者である都道府県（指定都市・中核市）へ、経営改善計画書を提出した。
+        </label>
+
+        <fieldset class="border p-2 mt-2 ms-4" id="improvement_plan_inputs" style="display: none;">
+          <label>受理日：
+            <input type="date" name="improvement_plan_date" class="form-control form-control-sm" disabled>
+          </label>
+        </fieldset>
+      </div>
+    </fieldset>
+
+    <script>
+    function toggleInputs(checkbox, containerId) {
+      const container = document.getElementById(containerId);
+      const inputs = container.querySelectorAll('input');
+      if (checkbox.checked) {
+        container.style.display = 'block';
+        inputs.forEach(input => input.disabled = false);
+      } else {
+        container.style.display = 'none';
+        inputs.forEach(input => input.disabled = true);
+      }
+    }
+    </script>
+
+      <!-- 備考 -->
+      <div class="mb-4">
+        <label for="memo" class="form-label">備考</label>
+        <textarea name="memo" id="memo" class="form-control" rows="3"></textarea>
+      </div>
+
+      <!-- 登録ボタン -->
+      <div class="text-center mt-4">
+          <button type="submit" class="btn btn-primary px-5">登録する</button>
+      </div>
 
   </form>
 </div>
