@@ -19,6 +19,7 @@ class Score(db.Model):
     id              = db.Column(db.Integer, primary_key=True)
     user_id         = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+    inputter_name = db.Column(db.String(100))   
 
     # 様式 2-1
     working_hours   = db.Column(db.Integer, default=0)

@@ -52,19 +52,6 @@
       </div>
     </fieldset>
 
-    <script>
-    function toggleClientInput() {
-      const select = document.getElementById('client_select');
-      const newClientDiv = document.getElementById('new_client_div');
-      if (select.value === 'new') {
-        newClientDiv.style.display = 'block';
-        document.getElementById('new_client_name').setAttribute('required', 'required');
-      } else {
-        newClientDiv.style.display = 'none';
-        document.getElementById('new_client_name').removeAttribute('required');
-      }
-    }
-    </script>
     <!-- ======== 様式 2‑1 追加分 ====================================== -->
     <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-1 就労継続支援Ａ型事業所におけるスコア表（全体）</h2>
     <!-- 労働時間 -->
@@ -89,24 +76,6 @@
       </div>
     </fieldset>
 
-    <script>
-      function updateScore() {
-        const select = document.getElementById('working_hours');
-        const scoreDisplay = document.getElementById('subtotal_score');
-        const selectedValue = select.value;
-        if (selectedValue) {
-          scoreDisplay.textContent = selectedValue;
-        } else {
-          scoreDisplay.textContent = '0';
-        }
-        updateTotalScore(); // 合計点数も更新
-      }
-
-      // ページ読み込み時にも初期表示を設定
-      window.onload = updateScore;
-    </script>
-
-
     <!-- 生産活動 -->
     <fieldset class="mb-4">
       <legend>Ⅱ. 生産活動</legend>
@@ -126,25 +95,6 @@
         </div>
       </div>
     </fieldset>
-
-    <script>
-      function updateProductionScore() {
-        const select = document.getElementById('production_result');
-        const scoreDisplay = document.getElementById('production_subtotal_score');
-        const selectedValue = select.value;
-        if (selectedValue) {
-          scoreDisplay.textContent = selectedValue;
-        } else {
-         scoreDisplay.textContent = '0';
-        }
-        updateTotalScore(); // 合計点数も更新
-      }
-
-      // ページ読み込み時の初期表示
-      window.onload = function() {
-        updateProductionScore();
-      };
-    </script>
 
     <!-- 多様な働き方 -->
     <fieldset class="mb-4">
@@ -188,29 +138,6 @@
       </div>
     </fieldset>
 
-    <script>
-    function updateDiversityScore() {
-      const checkboxes = document.querySelectorAll('input[name="diversity[]"]');
-      let checkedCount = 0;
-      checkboxes.forEach(cb => {
-        if(cb.checked) checkedCount++;
-      });
-
-      let score = 0;
-      if (checkedCount >= 5) {
-        score = 15;
-      } else if (checkedCount >= 3) {
-        score = 5;
-      } else {
-        score = 0;
-      }
-
-      document.getElementById('diversity_subtotal_score').textContent = score;
-      updateTotalScore(); // 合計点数も更新
-    }
-    </script>
-
-
     <!-- 支援力向上 -->
     <fieldset class="mb-4">
       <legend>Ⅳ. 支援力向上</legend>
@@ -252,29 +179,6 @@
       </div>
     </fieldset>
 
-    <script>
-    function updateSupportSkillScore() {
-      const checkboxes = document.querySelectorAll('input[name="support_skill[]"]');
-      let checkedCount = 0;
-      checkboxes.forEach(cb => {
-        if(cb.checked) checkedCount++;
-      });
-
-      let score = 0;
-      if (checkedCount >= 5) {
-        score = 15;
-      } else if (checkedCount >= 3) {
-        score = 5;
-      } else {
-        score = 0;
-      }
-
-      document.getElementById('support_skill_subtotal_score').textContent = score;
-      updateTotalScore(); // 合計点数も更新
-    }
-    </script>
-
-
     <!-- Ⅴ. 地域連携活動 ------------------------------------------------>
     <fieldset class="mb-4">
       <legend>Ⅴ. 地域連携活動</legend>
@@ -292,20 +196,6 @@
         <strong>小計点数: </strong><span id="regional_activity_subtotal_score">0</span> 点
       </div>
     </fieldset>
-
-    <script>
-    function updateRegionalActivityScore() {
-      const checkboxes = document.querySelectorAll('input[name="regional_activity[]"]');
-      let checked = false;
-      checkboxes.forEach(cb => {
-        if(cb.checked) checked = true;
-      });
-
-      const score = checked ? 10 : 0;
-      document.getElementById('regional_activity_subtotal_score').textContent = score;
-      updateTotalScore(); // 合計点数も更新
-    }
-    </script>
 
     <!-- Ⅵ. 経営改善計画 --------------------------------------------->
     <fieldset class="mb-4">
@@ -335,21 +225,6 @@
       </div>
     </fieldset>
 
-    <script>
-    function updateImprovePlanScore() {
-      const radios = document.getElementsByName('improve_plan');
-      let score = 0;
-      for(let radio of radios) {
-        if(radio.checked) {
-          score = parseInt(radio.value);
-          break;
-        }
-      }
-      document.getElementById('improve_plan_subtotal_score').textContent = score;
-      updateTotalScore(); // 合計点数も更新
-    }
-    </script>
-
     <!-- Ⅶ. 利用者の知識・能力向上 ------------------------------------->
     <fieldset class="mb-4">
       <legend>Ⅶ. 利用者の知識・能力向上</legend>
@@ -377,69 +252,10 @@
       </div>
     </fieldset>
 
-    <script>
-    function updateUserSkillUpScore() {
-      const radios = document.getElementsByName('user_skill_up');
-      let score = 0;
-      for (const radio of radios) {
-        if (radio.checked) {
-          score = parseInt(radio.value);
-          break;
-        }
-      }
-      document.getElementById('user_skill_up_subtotal_score').textContent = score;
-      updateTotalScore(); // 合計点数も更新
-    }
-    </script>
-
     <!--  様式2-1の合計点数を表示　----------------------------->
     <div class="mt-4 border-top pt-3">
       <h4>様式2-1合計点数: <span id="total_score_display">0</span> 点</h4>
     </div>
-    <script>
-    function updateTotalScore() {
-      // 各小計の要素ID（必要に応じて追加）
-      const subtotalIds = [
-        'subtotal_score',                   // 労働時間
-        'production_subtotal_score',        // 生産活動
-        'diversity_subtotal_score',         // 多様な働き方
-        'support_skill_subtotal_score',     // 支援力向上
-        'regional_activity_subtotal_score', // 地域連携活動
-        'improve_plan_subtotal_score',      // 経営改善計画
-        'user_skill_up_subtotal_score'      // 利用者の知識・能力向上
-      ];
-
-      let total = 0;
-      subtotalIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          const val = parseInt(el.textContent);
-          if (!isNaN(val)) {
-            total += val;
-          }
-        }
-      });
-
-      // 合計を表示
-      document.getElementById('total_score_display').textContent = total;
-    }
-
-    // すべての小計更新後に合計も更新する
-    function updateAllScores() {
-      updateScore();                      // 労働時間の小計更新
-      updateProductionScore();            // 生産活動
-      updateDiversityScore();            // 多様な働き方
-      updateSupportSkillScore();         // 支援力向上
-      updateRegionalActivityScore();     // 地域連携活動
-      updateImprovePlanScore();          // 経営改善計画
-      updateUserSkillUpScore();          // 利用者の知識・能力向上
-      updateTotalScore();                // 最後に合計
-    }
-
-    // ページ読み込み時にも計算
-    window.onload = updateAllScores;
-    </script>
-
 
     <!-- ======== 様式 2‑2 追加分 ====================================== -->
     <h2 class="mt-5 mb-3 border-bottom pb-1">様式 2-2 就労継続支援Ａ型事業所におけるスコア表（実績Ⅰ～Ⅳ、Ⅵ）</h2>
@@ -514,15 +330,6 @@
       </table>
     </fieldset>
 
-    <script>
-    function calculateBalance(y) {
-      const income = parseInt(document.getElementById(`income_${y}`).value) || 0;
-      const wage = parseInt(document.getElementById(`wage_${y}`).value) || 0;
-      const balance = income - wage;
-      document.getElementById(`balance_${y}`).value = balance.toLocaleString() + ' 円';
-    }
-    </script>
-
     <!-- Ⅲ. 多様な働き方（詳細欄） ----------------------------------->
     <fieldset class="mb-4">
       <legend>Ⅲ. 多様な働き方（該当するものすべてにチェック）</legend>
@@ -594,28 +401,13 @@
         </div>
       </div>
 
-      <script>
-      function toggleInputs(checkbox, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input');
-
-        if (checkbox.checked) {
-          container.style.display = 'block';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          container.style.display = 'none';
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
-
       <!-- ②研修、学会等又は学会誌等において発表 -->
       <div class="mb-3">
         <h6>②研修、学会等又は学会誌等において発表</h6>
         <div class="form-check mb-2">
-          <input class="form-check-input" type="checkbox" id="presentation_seminar"
+          <input class="form-check-input" type="checkbox" id="presentation_seminar_1"
                 onchange="toggleInputs(this, 'presentation_inputs')">
-          <label class="form-check-label" for="presentation_seminar">
+          <label class="form-check-label" for="presentation_seminar_1">
             ◎研修、学会等又は学会誌等において1回以上発表している
           </label>
           <div class="mt-2 ms-4" id="presentation_inputs" style="display: none;">
@@ -643,20 +435,6 @@
           </div>
         </div>
       </div>
-
-      <script>
-      function toggleInputs(checkbox, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input');
-        if (checkbox.checked) {
-          container.style.display = 'block';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          container.style.display = 'none';
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
 
       <!-- ③視察・実習の実施又は受け入れ-------->
       <div class="mb-3">
@@ -696,21 +474,6 @@
         </div>
       </div>
 
-      <script>
-      function toggleVisitInputs() {
-        const checkbox = document.getElementById("advanced_visits");
-        const inputsDiv = document.getElementById("visit_inputs");
-        const inputs = inputsDiv.querySelectorAll("input");
-        if (checkbox.checked) {
-          inputsDiv.style.display = "block";
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          inputsDiv.style.display = "none";
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
-
       <!-- ④販路拡大の商談会等への参加 -->
       <div class="mb-3">
         <h6>④販路拡大の商談会等への参加</h6>
@@ -736,20 +499,6 @@
           </fieldset>
         </div>
       </div>
-
-      <script>
-      function toggleInputs(checkbox, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input');
-        if (checkbox.checked) {
-          container.style.display = 'block';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          container.style.display = 'none';
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
 
       <!-- ⑤職員の人事評価制度 -->
       <div class="mb-3">
@@ -781,20 +530,6 @@
         </div>
       </div>
 
-      <script>
-      function toggleInputs(checkbox, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input');
-        if (checkbox.checked) {
-          container.style.display = 'block';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          container.style.display = 'none';
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
-
       <!-- ⑥ピアサポーターの配置 -->
       <div class="mb-3">
         <h6>⑥ピアサポーターの配置</h6>
@@ -823,20 +558,6 @@
         </div>
       </div>
 
-      <script>
-      function toggleInputs(checkbox, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input');
-        if (checkbox.checked) {
-          container.style.display = 'block';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          container.style.display = 'none';
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
-
       <!-- ⑦第三者評価 -->
       <div class="mb-3">
         <h6>⑦第三者評価</h6>
@@ -857,20 +578,6 @@
         </div>
       </div>
 
-      <script>
-      function toggleInputs(checkbox, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input');
-        if (checkbox.checked) {
-          container.style.display = 'block';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          container.style.display = 'none';
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
-
       <!-- ⑧国際標準化企画が定めた規格等の認証等 -->
       <div class="mb-3">
         <h6>⑧国際標準化企画が定めた規格等の認証等</h6>
@@ -890,20 +597,6 @@
           </fieldset>
         </div>
       </div>
-
-      <script>
-      function toggleInputs(checkbox, containerId) {
-        const container = document.getElementById(containerId);
-        const inputs = container.querySelectorAll('input');
-        if (checkbox.checked) {
-          container.style.display = 'block';
-          inputs.forEach(input => input.disabled = false);
-        } else {
-          container.style.display = 'none';
-          inputs.forEach(input => input.disabled = true);
-        }
-      }
-      </script>
     </fieldset>
 
     <!-- Ⅵ. 経営改善計画（既存ラジオに詳細欄追加） ------------------->
@@ -924,20 +617,6 @@
       </div>
     </fieldset>
 
-    <script>
-    function toggleInputs(checkbox, containerId) {
-      const container = document.getElementById(containerId);
-      const inputs = container.querySelectorAll('input');
-      if (checkbox.checked) {
-        container.style.display = 'block';
-        inputs.forEach(input => input.disabled = false);
-      } else {
-        container.style.display = 'none';
-        inputs.forEach(input => input.disabled = true);
-      }
-    }
-    </script>
-
       <!-- 備考 -->
       <div class="mb-4">
         <label for="memo" class="form-label">備考</label>
@@ -948,6 +627,108 @@
       <div class="text-center mt-4">
           <button type="submit" class="btn btn-primary px-5">登録する</button>
       </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        updateAllScores();
+        toggleClientInput();
+      });
+
+      // すべてのスコア計算と更新を一括で
+      function updateAllScores() {
+        updateScore();                      // 労働時間
+        updateProductionScore();            // 生産活動
+        updateDiversityScore();            // 多様な働き方
+        updateSupportSkillScore();         // 支援力向上
+        updateRegionalActivityScore();     // 地域連携活動
+        updateImprovePlanScore();          // 経営改善計画
+        updateUserSkillUpScore();          // 利用者の知識・能力向上
+        updateTotalScore();                // 合計
+      }
+
+      // 合計点数計算
+      function updateTotalScore() {
+        const ids = [
+          'subtotal_score',
+          'production_subtotal_score',
+          'diversity_subtotal_score',
+          'support_skill_subtotal_score',
+          'regional_activity_subtotal_score',
+          'improve_plan_subtotal_score',
+          'user_skill_up_subtotal_score'
+        ];
+        let total = 0;
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          const val = parseInt(el?.textContent);
+          if (!isNaN(val)) total += val;
+        });
+        document.getElementById('total_score_display').textContent = total;
+      }
+
+      // 各スコア更新関数
+      function updateScore() {
+        const v = document.getElementById('working_hours').value;
+        document.getElementById('subtotal_score').textContent = v || 0;
+        updateTotalScore();
+      }
+      function updateProductionScore() {
+        const v = document.getElementById('production_result').value;
+        document.getElementById('production_subtotal_score').textContent = v || 0;
+        updateTotalScore();
+      }
+      function updateDiversityScore() {
+        const checked = [...document.querySelectorAll('input[name="diversity[]"]:checked')].length;
+        let score = checked >= 5 ? 15 : checked >= 3 ? 5 : 0;
+        document.getElementById('diversity_subtotal_score').textContent = score;
+        updateTotalScore();
+      }
+      function updateSupportSkillScore() {
+        const checked = [...document.querySelectorAll('input[name="support_skill[]"]:checked')].length;
+        let score = checked >= 5 ? 15 : checked >= 3 ? 5 : 0;
+        document.getElementById('support_skill_subtotal_score').textContent = score;
+        updateTotalScore();
+      }
+      function updateRegionalActivityScore() {
+        const checked = document.querySelector('input[name="regional_activity[]"]:checked');
+        document.getElementById('regional_activity_subtotal_score').textContent = checked ? 10 : 0;
+        updateTotalScore();
+      }
+      function updateImprovePlanScore() {
+        const selected = document.querySelector('input[name="improve_plan"]:checked');
+        const score = selected ? parseInt(selected.value) : 0;
+        document.getElementById('improve_plan_subtotal_score').textContent = score;
+        updateTotalScore();
+      }
+      function updateUserSkillUpScore() {
+        const selected = document.querySelector('input[name="user_skill_up"]:checked');
+        const score = selected ? parseInt(selected.value) : 0;
+        document.getElementById('user_skill_up_subtotal_score').textContent = score;
+        updateTotalScore();
+      }
+
+      // 利用者選択時の表示切替
+      function toggleClientInput() {
+        const select = document.getElementById('client_select');
+        const div = document.getElementById('new_client_div');
+        const input = document.getElementById('new_client_name');
+        if (select.value === 'new') {
+          div.style.display = 'block';
+          input.setAttribute('required', 'required');
+        } else {
+          div.style.display = 'none';
+          input.removeAttribute('required');
+        }
+      }
+
+      // 詳細入力欄表示切り替え
+      function toggleInputs(checkbox, containerId) {
+        const container = document.getElementById(containerId);
+        const inputs = container.querySelectorAll('input');
+        container.style.display = checkbox.checked ? 'block' : 'none';
+        inputs.forEach(input => input.disabled = !checkbox.checked);
+      }
+    </script>
 
   </form>
 </div>

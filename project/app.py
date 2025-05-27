@@ -16,10 +16,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Score
 from datetime import datetime
 import json
+import os
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # TODO: 本番は環境変数で管理する
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///essms.db"
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(basedir, "instance", "essms.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
