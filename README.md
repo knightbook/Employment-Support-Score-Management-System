@@ -94,6 +94,7 @@ pip install -r requirements.txt
 ### 4.Flaskアプリのあるディレクトリに移動し起動
 ```bash
 cd project
+python add_dummy_scores.py
 python app.py
 ```
 ### 5.ブラウザでアクセス

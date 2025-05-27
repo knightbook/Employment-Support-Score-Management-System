@@ -5,22 +5,35 @@
 - スコア入力・保存（様式 2-1, 2-2 対応）
 - スコア一覧表示
 - スコア集計・グラフ表示（棒／折れ線／レーダー）
+- CSV出力対応
 SQLite + SQLAlchemy で永続化
 """
 
 from flask import (
     Flask, render_template, request, redirect,
-    url_for, flash, session
+    url_for, flash, session, Response
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Score
 from datetime import datetime
 import json
 import os
+import csv
+from flask import Response
+from io import StringIO
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # TODO: 本番は環境変数で管理する
 
+from utils.filters import display_labels, DIVERSITY_LABELS, SUPPORT_SKILL_LABELS
+
+@app.template_filter('display_diversity')
+def display_diversity_filter(value):
+    return display_labels(value, DIVERSITY_LABELS)
+
+@app.template_filter('display_support_skill')
+def display_support_skill_filter(value):
+    return display_labels(value, SUPPORT_SKILL_LABELS)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 db_path = os.path.join(basedir, "instance", "essms.db")
@@ -41,7 +54,6 @@ def login():
         flash("ユーザーIDまたはパスワードが違います。")
     return render_template("login.html")
 
-
 @app.route("/sign_up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
@@ -61,7 +73,6 @@ def sign_up():
         flash("登録完了しました。ログインしてください。")
         return redirect(url_for("login"))
     return render_template("sign_up.html")
-
 
 @app.route("/logout")
 def logout():
@@ -157,16 +168,9 @@ def aggregate():
         flash("ログインしてください。")
         return redirect(url_for("login"))
 
-    # パラメータ受け取り
-    start_date_str = request.args.get(
-        "start_date",
-        datetime.now().replace(month=1, day=1).strftime("%Y-%m-%d")
-    )
-    end_date_str = request.args.get(
-        "end_date",
-        datetime.now().strftime("%Y-%m-%d")
-    )
-    graph_type = request.args.get("graph_type", "line")  # line / bar / radar
+    start_date_str = request.args.get("start_date", datetime.now().replace(month=1, day=1).strftime("%Y-%m-%d"))
+    end_date_str = request.args.get("end_date", datetime.now().strftime("%Y-%m-%d"))
+    graph_type = request.args.get("graph_type", "line")
 
     try:
         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
@@ -175,7 +179,6 @@ def aggregate():
         flash("日付の形式が正しくありません。")
         return redirect(url_for("aggregate"))
 
-    # データ抽出 & 集計
     scores = (
         Score.query
         .filter(
@@ -193,24 +196,86 @@ def aggregate():
         aggregate_data[date_key] = aggregate_data.get(date_key, 0) + sc.total
 
     total_score = sum(aggregate_data.values())
-    avg_score   = total_score / len(aggregate_data) if aggregate_data else 0
+    avg_score = total_score / len(aggregate_data) if aggregate_data else 0
 
     sorted_dates = sorted(aggregate_data.keys())
-    totals       = [aggregate_data[d] for d in sorted_dates]
+    totals = [aggregate_data[d] for d in sorted_dates]
 
-    return render_template(
-        "aggregate.html",
-        dates=sorted_dates,
-        totals=totals,
-        total_score=total_score,
-        avg_score=avg_score,
-        start_date=start_date_str,
-        end_date=end_date_str,
-        graph_type=graph_type
-    )
+    return render_template("aggregate.html",
+                           dates=sorted_dates,
+                           totals=totals,
+                           total_score=total_score,
+                           avg_score=avg_score,
+                           start_date=start_date_str,
+                           end_date=end_date_str,
+                           graph_type=graph_type)
 
 # ------------------------------------------------------------------
-# プレースホルダ（将来機能追加用）
+# CSV出力
+# ------------------------------------------------------------------
+@app.route("/aggregate/csv_full")
+def download_csv_full():
+    if "user_id" not in session:
+        flash("ログインしてください。")
+        return redirect(url_for("login"))
+
+    start_date_str = request.args.get("start_date", datetime.now().replace(month=1, day=1).strftime("%Y-%m-%d"))
+    end_date_str = request.args.get("end_date", datetime.now().strftime("%Y-%m-%d"))
+
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+    except ValueError:
+        flash("日付の形式が正しくありません。")
+        return redirect(url_for("aggregate"))
+
+    scores = (
+        Score.query
+        .filter(
+            Score.user_id == session["user_id"],
+            Score.created_at >= start_date,
+            Score.created_at <= end_date
+        )
+        .order_by(Score.created_at.asc())
+        .all()
+    )
+
+    si = StringIO()
+    writer = csv.writer(si)
+
+    # ヘッダー
+    writer.writerow([
+        "登録日", "入力者", "稼働時間", "生産結果", "多様な働き方", "支援力向上",
+        "地域連携", "経営改善", "知識向上", "利用者数", "平均賃金", "雇用率", "備考", "合計スコア"
+    ])
+
+    for sc in scores:
+        writer.writerow([
+            sc.created_at.strftime("%Y-%m-%d"),
+            sc.inputter_name or "",
+            sc.working_hours,
+            sc.production_res,
+            sc.diversity,
+            sc.support_skill,
+            sc.regional_score,
+            sc.improve_plan,
+            sc.skill_up,
+            sc.num_users,
+            sc.average_wage,
+            sc.employment_rate or "",
+            sc.memo or "",
+            sc.total
+        ])
+
+    return Response(
+        si.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=score_details.csv"}
+    )
+
+
+# ------------------------------------------------------------------
+# プレースホルダ
 # ------------------------------------------------------------------
 @app.route("/user_list")
 def user_list():

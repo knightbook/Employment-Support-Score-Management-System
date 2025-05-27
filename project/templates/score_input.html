@@ -728,6 +728,13 @@
         container.style.display = checkbox.checked ? 'block' : 'none';
         inputs.forEach(input => input.disabled = !checkbox.checked);
       }
+
+      function calculateBalance(y) {
+        const income = parseInt(document.getElementById(`income_${y}`).value) || 0;
+        const wage = parseInt(document.getElementById(`wage_${y}`).value) || 0;
+        const balance = income - wage;
+        document.getElementById(`balance_${y}`).value = balance + " 円";
+      }
     </script>
 
   </form>
