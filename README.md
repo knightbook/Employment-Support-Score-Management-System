@@ -115,6 +115,8 @@ http://127.0.0.1:5000/
 - [ガントチャートを見るExcel](docs/gantt_schedule.xlsx)
 - [ガントチャートを見るスプレッドシート](https://docs.google.com/spreadsheets/d/1azG9TA4BbKPsPT6v6eGvHxt8wK9uoPRG2MnWV8D-lPI/edit?usp=sharing)
 
+- [プレゼン資料](https://docs.google.com/presentation/d/18DNGRVk3PhtBTFTcNVTN4zBtdowdTRJ_uZr1zD-qAKA/edit?usp=sharing)
+
 ---
 
 ## 📌 ライセンス / 著作権
