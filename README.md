@@ -30,14 +30,14 @@ Employment-Support-Score-Management-System/
 
 ### 🔙 バックエンド
 - **Python 3.x**
-- **Flask** – 軽量Webフレームワーク
+- **Flask** – Pythonの軽量Webフレームワーク
 - **Jinja2** – テンプレートエンジン（Flask組み込み）
 - **SQLite** – 軽量データベース（ファイルベース）
 - **SQLAlchemy** – ORM（オブジェクト関係マッピング）
 
 ### 🎨 フロントエンド
 - **HTML5 / CSS3**
-- **Bootstrap 5** – モバイルファーストなCSSフレームワーク（CDN利用）
+- **Bootstrap 5** – CSSフレームワーク（CDN利用）
 - **JavaScript** – フォームバリデーションなどに利用予定
 
 ### ⚙ その他・開発ツール
@@ -45,6 +45,7 @@ Employment-Support-Score-Management-System/
 - **draw.io** – ワイヤーフレーム・図作成
 - **Excel / Googleスプレッドシート** – ガントチャート、仕様管理
 - **venv** – 仮想環境構築
+- **Markdown + Mermaid** – READMEや設計ドキュメントのフロー図・ER図作成
 
 ---
 
