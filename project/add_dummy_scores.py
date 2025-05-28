@@ -2,6 +2,7 @@ from app import app, db
 from models import Score, Client
 from datetime import datetime
 import random
+import math
 
 user_list = [
     {"id": 1, "name": "テスト太郎"},
@@ -10,7 +11,7 @@ user_list = [
 ]
 
 with app.app_context():
-    # ① 先に Client（利用者）レコードがDBに無い場合は必ず追加
+    # ① 利用者レコード追加
     for user in user_list:
         client = Client.query.filter_by(id=user["id"]).first()
         if not client:
@@ -18,21 +19,26 @@ with app.app_context():
             db.session.add(client)
     db.session.commit()
 
-    # ② Score（スコア）ダミーデータ投入
+    # ② スコア・ダミーデータ
     for user in user_list:
+        base_bias = random.randint(-20, 20)  # 各利用者で全体的に強弱をつける
         for month in range(1, 13):
             date = datetime(2024, month, 1)
             total_max = 200
 
-            # 値をランダム生成
-            working_hours = random.randint(40, 120)
-            production_res = random.randint(10, 70)
-            diversity_vals = [random.randint(1, 5) for _ in range(4)]
+            # 「周期性＋乱数」混ぜてランダム性を強調
+            phase = random.uniform(-math.pi, math.pi)
+            amplitude = random.randint(10, 25)
+            # 各項目も波＋乱数で生成
+            working_hours   = int(60 + amplitude * math.sin(month + phase) + random.randint(-15, 15) + base_bias)
+            production_res  = int(25 + amplitude * math.cos(month * 1.5 + phase) + random.randint(-10, 10))
+            diversity_vals  = [random.randint(1, 5) for _ in range(4)]
             support_skill_vals = [random.randint(1, 5) for _ in range(3)]
-            regional_score = random.randint(0, 20)
-            improve_plan = random.randint(0, 15)
-            skill_up = random.randint(0, 20)
+            regional_score  = random.randint(0, 20)
+            improve_plan    = random.choice([0, random.randint(1, 15)])  # 0の月も
+            skill_up        = random.choice([0, random.randint(5, 20)])
 
+            # 必ず上限に収めるロジック
             tmp_total = (
                 working_hours + production_res +
                 sum(diversity_vals) * 5 +
@@ -40,29 +46,29 @@ with app.app_context():
                 regional_score + improve_plan + skill_up
             )
 
-            while tmp_total > total_max:
-                candidates = []
-                if working_hours > 40: candidates.append('working_hours')
-                if production_res > 10: candidates.append('production_res')
-                if sum(diversity_vals) > 4: candidates.append('diversity')
-                if sum(support_skill_vals) > 3: candidates.append('support_skill')
-                if regional_score > 0: candidates.append('regional_score')
-                if improve_plan > 0: candidates.append('improve_plan')
-                if skill_up > 0: candidates.append('skill_up')
-                if not candidates: break
-                choice = random.choice(candidates)
-                if choice == 'working_hours': working_hours -= 1
-                elif choice == 'production_res': production_res -= 1
-                elif choice == 'diversity':
-                    i = diversity_vals.index(max(diversity_vals))
-                    if diversity_vals[i] > 1: diversity_vals[i] -= 1
-                elif choice == 'support_skill':
-                    i = support_skill_vals.index(max(support_skill_vals))
-                    if support_skill_vals[i] > 1: support_skill_vals[i] -= 1
-                elif choice == 'regional_score': regional_score -= 1
-                elif choice == 'improve_plan': improve_plan -= 1
-                elif choice == 'skill_up': skill_up -= 1
-
+            # 下限保証も(例: 80点未満は引き上げ)
+            min_total = 80
+            while tmp_total > total_max or tmp_total < min_total:
+                # 上限超なら一部減算
+                if tmp_total > total_max:
+                    idx = random.randint(0, 3)
+                    if diversity_vals[idx] > 1: diversity_vals[idx] -= 1
+                    if support_skill_vals[idx % 3] > 1: support_skill_vals[idx % 3] -= 1
+                    if working_hours > 40: working_hours -= 2
+                    if production_res > 10: production_res -= 2
+                    if regional_score > 0: regional_score -= 1
+                    if improve_plan > 0: improve_plan -= 1
+                    if skill_up > 0: skill_up -= 1
+                # 下限割れは少し加算
+                elif tmp_total < min_total:
+                    idx = random.randint(0, 3)
+                    if diversity_vals[idx] < 5: diversity_vals[idx] += 1
+                    if support_skill_vals[idx % 3] < 5: support_skill_vals[idx % 3] += 1
+                    if working_hours < 120: working_hours += 2
+                    if production_res < 70: production_res += 2
+                    if regional_score < 20: regional_score += 1
+                    if improve_plan < 15: improve_plan += 1
+                    if skill_up < 20: skill_up += 1
                 tmp_total = (
                     working_hours + production_res +
                     sum(diversity_vals) * 5 +
@@ -77,8 +83,8 @@ with app.app_context():
             employment_rate = random.randint(60, 100)
 
             score = Score(
-                client_id=user["id"],              # 利用者ID
-                staff_user_id=1,                   # 入力スタッフID（本番は適宜変更）
+                client_id=user["id"],
+                staff_user_id=1,  # 入力スタッフID（本番は適宜変更）
                 created_at=date,
                 working_hours=working_hours,
                 production_res=production_res,

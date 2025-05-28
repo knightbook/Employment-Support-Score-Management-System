@@ -1,124 +1,118 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <title>スコア集計・グラフ表示</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .chart-container {
-      max-width: 1200px;
-      margin: auto;
-      aspect-ratio: 2 / 1;
-      position: relative;
-    }
-    a.button {
-      display: inline-block;
-      margin: 10px 0;
-      padding: 6px 14px;
-      background-color: #007BFF;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-    }
-    a.button:hover {
-      background-color: #0056b3;
-    }
-  </style>
-</head>
-<body>
-  <h2>スコア集計・グラフ表示</h2>
+{% extends 'base.html' %}
+{% block title %}スコア集計・グラフ表示 | 就労支援A型{% endblock %}
 
-  <form method="get" action="{{ url_for('aggregate') }}">
-    <label>開始日:
-      <input type="date" name="start_date" value="{{ start_date }}" required />
-    </label>
-    <label>終了日:
-      <input type="date" name="end_date" value="{{ end_date }}" required />
-    </label>
-    <label>利用者:
-      <select name="client_id">
-        <option value="">全体</option>
-        {% for client in clients %}
-          <option value="{{ client.id }}" {% if client_id==client.id %}selected{% endif %}>
-            {{ client.name }}
-          </option>
-        {% endfor %}
-      </select>
-    </label>
-    <label>グラフ種類:
-      <select name="graph_type">
-        <option value="line"  {% if graph_type == 'line' %}selected{% endif %}>折れ線</option>
-        <option value="bar"   {% if graph_type == 'bar' %}selected{% endif %}>棒グラフ</option>
-        <option value="radar" {% if graph_type == 'radar' %}selected{% endif %}>レーダー</option>
-      </select>
-    </label>
-    <button type="submit">集計</button>
-  </form>
+{% block content %}
+<style>
+  .chart-container {
+    max-width: 1200px;
+    margin: auto;
+    aspect-ratio: 2 / 1;
+    position: relative;
+  }
+  a.button {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 6px 14px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+  a.button:hover {
+    background-color: #0056b3;
+  }
+</style>
 
-  <p>※「利用者」プルダウンで個別／全体の切り替えができます</p>
+<h2>スコア集計・グラフ表示</h2>
 
-  <ul>
-    <li><strong>折れ線グラフ:</strong> スコアの推移や傾向を見たいときに適しています。</li>
-    <li><strong>棒グラフ:</strong> 各日のスコアの大きさを比較したいときに便利です。</li>
-    <li><strong>レーダーチャート:</strong> 各利用者のスコア傾向の比較や、全体バランス分析に。</li>
-  </ul>
+<form method="get" action="{{ url_for('aggregate') }}">
+  <label>開始日:
+    <input type="date" name="start_date" value="{{ start_date }}" required />
+  </label>
+  <label>終了日:
+    <input type="date" name="end_date" value="{{ end_date }}" required />
+  </label>
+  <label>利用者:
+    <select name="client_id">
+      <option value="">全体</option>
+      {% for client in clients %}
+        <option value="{{ client.id }}" {% if client_id==client.id %}selected{% endif %}>
+          {{ client.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>グラフ種類:
+    <select name="graph_type">
+      <option value="line"  {% if graph_type == 'line' %}selected{% endif %}>折れ線</option>
+      <option value="bar"   {% if graph_type == 'bar' %}selected{% endif %}>棒グラフ</option>
+      <option value="radar" {% if graph_type == 'radar' %}selected{% endif %}>レーダー</option>
+    </select>
+  </label>
+  <button type="submit">集計</button>
+</form>
 
-  <p>合計スコア: {{ total_score }}</p>
-  <p>平均スコア: {{ "%.2f"|format(avg_score) }}</p>
+<p>※「利用者」プルダウンで個別／全体の切り替えができます</p>
 
-  <a href="{{ url_for('download_csv_full') }}?start_date={{ start_date }}&end_date={{ end_date }}&client_id={{ client_id }}" class="button">
-    📥 詳細CSVダウンロード
-  </a>
+<ul>
+  <li><strong>折れ線グラフ:</strong> スコアの推移や傾向を見たいときに適しています。</li>
+  <li><strong>棒グラフ:</strong> 各日のスコアの大きさを比較したいときに便利です。</li>
+  <li><strong>レーダーチャート:</strong> 各利用者のスコア傾向の比較や、全体バランス分析に。</li>
+</ul>
 
-  <div class="chart-container">
-    <canvas id="scoreChart"></canvas>
-  </div>
+<p>合計スコア: {{ total_score }}</p>
+<p>平均スコア: {{ "%.2f"|format(avg_score) }}</p>
 
-  <script>
-    const ctx = document.getElementById('scoreChart').getContext('2d');
-    const chartType = "{{ graph_type }}";
-    const labels = {{ dates | tojson }}; // x軸（日付）
-    // 複数利用者対応 → datasetsは [{label: 利用者名, data: [], ...}, ...]
-    const datasets = {{ datasets | tojson }};
-    // datasets: [{label: "テスト太郎", data: [...]}, {label: "ダミー花子", data: [...]}, ...]
-    // 全体の場合は1件（label: "全体"）
+<a href="{{ url_for('download_csv_full') }}?start_date={{ start_date }}&end_date={{ end_date }}&client_id={{ client_id }}" class="button">
+  📥 詳細CSVダウンロード
+</a>
 
-    const titleMap = {
-      line: '日別スコアの推移（折れ線グラフ）',
-      bar: '日別スコアの比較（棒グラフ）',
-      radar: '利用者ごとのスコア分布（レーダーチャート）'
-    };
+<div class="chart-container">
+  <canvas id="scoreChart"></canvas>
+</div>
 
-    const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: true },
-            title: {
-                display: true,
-                text: titleMap[chartType] || 'スコアグラフ',
-                font: { size: 24, weight: 'bold' },
-                color: '#333'
-            }
-        },
-    };
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('scoreChart').getContext('2d');
+  const chartType = "{{ graph_type }}";
+  const labels = {{ dates | tojson }};
+  const datasets = {{ datasets | tojson }};
 
-    const config = {
-      type: chartType,
-      data: {
-        labels: labels,
-        datasets: datasets
+  const titleMap = {
+    line: '日別スコアの推移（折れ線グラフ）',
+    bar: '日別スコアの比較（棒グラフ）',
+    radar: '利用者ごとのスコア分布（レーダーチャート）'
+  };
+
+  const commonOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+          legend: { display: true },
+          title: {
+              display: true,
+              text: titleMap[chartType] || 'スコアグラフ',
+              font: { size: 24, weight: 'bold' },
+              color: '#333'
+          }
       },
-      options: chartType === 'radar' ? commonOptions : {
-        ...commonOptions,
-        scales: {
-          x: { title: { display: true, text: '日付' } },
-          y: { title: { display: true, text: 'スコア' }, beginAtZero: true }
-        }
-      }
-    };
+  };
 
-    new Chart(ctx, config);
-  </script>
-</body>
-</html>
+  const config = {
+    type: chartType,
+    data: {
+      labels: labels,
+      datasets: datasets
+    },
+    options: chartType === 'radar' ? commonOptions : {
+      ...commonOptions,
+      scales: {
+        x: { title: { display: true, text: '日付' } },
+        y: { title: { display: true, text: 'スコア' }, beginAtZero: true }
+      }
+    }
+  };
+
+  new Chart(ctx, config);
+</script>
+{% endblock %}

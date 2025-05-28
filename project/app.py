@@ -151,7 +151,10 @@ def score_input():
         flash(f"スコアを登録しました。（合計 {sc.total} 点）")
         return redirect(url_for("score_list"))
 
-    return render_template("score_input.html", clients=clients, current_user=user)
+    return render_template("score_input.html", 
+                           clients=clients, 
+                           current_user=user,
+                           menu_nav=True)
 
 # ------------------------------------------------------------------
 # スコア一覧
@@ -168,7 +171,11 @@ def score_list():
     if client_id:
         query = query.filter(Score.client_id == int(client_id))
     scores = query.all()
-    return render_template("score_list.html", scores=scores, clients=clients, client_id=client_id)
+    return render_template("score_list.html",
+                            scores=scores,
+                            clients=clients, 
+                            client_id=client_id,
+                            menu_nav=True)
 
 
 # ------------------------------------------------------------------
@@ -263,7 +270,8 @@ def aggregate():
                            end_date=end_date_str,
                            graph_type=graph_type,
                            clients=clients,
-                           client_id=client_id)
+                           client_id=client_id,
+                           menu_nav=True)
 
 
 # ------------------------------------------------------------------
@@ -341,21 +349,6 @@ def download_csv_full():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment;filename=score_details.csv"}
     )
-
-# ------------------------------------------------------------------
-# プレースホルダ
-# ------------------------------------------------------------------
-@app.route("/user_list")
-def user_list():
-    return "<h3>ユーザー一覧（開発中）</h3>"
-
-@app.route("/data_management")
-def data_management():
-    return "<h3>データ管理（開発中）</h3>"
-
-@app.route("/help")
-def help():
-    return "<h3>ヘルプページ（開発中）</h3>"
 
 # ------------------------------------------------------------------
 # アプリ起動

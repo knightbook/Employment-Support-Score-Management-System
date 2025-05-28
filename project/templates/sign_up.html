@@ -22,8 +22,10 @@
               <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" required>
           </div>
 
-          <button type="submit" class="btn btn-success">新規作成</button>
-          <a href="{{ url_for('login') }}" class="btn btn-secondary ms-2">キャンセル</a>
+          <div class="d-flex justify-content-center mt-4">
+              <button type="submit" class="btn btn-success px-4 mx-2" style="white-space: nowrap;">新規作成</button>
+              <a href="{{ url_for('login') }}" class="btn btn-outline-secondary px-4 mx-2" style="white-space: nowrap;">キャンセル</a>
+          </div>
       </form>
     </div>
 </div>
